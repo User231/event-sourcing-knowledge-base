@@ -39,10 +39,12 @@ github_repos:
   - url: https://github.com/EventStore/EventStore
     tags: [eventstoredb, database, dotnet]
     description: "EventStoreDB — purpose-built database for event sourcing"
+    clone: false  # Storage engine internals, not ES pattern code
 
   - url: https://github.com/JasperFx/marten
     tags: [marten, dotnet, postgresql]
     description: "Marten — .NET document DB and event store on PostgreSQL"
+    code_paths: ["src/samples/", "src/Marten/Events/"]  # Core is storage engine; scope to samples + event sourcing core
 
   - url: https://github.com/commanded/commanded
     tags: [commanded, elixir, cqrs]
@@ -63,6 +65,7 @@ github_repos:
   - url: https://github.com/eventsourcing/es4j
     tags: [java, cqrs]
     description: "ES4J — Event capture and querying for Java"
+    clone: false  # Event capture/storage engine, not pattern examples
 
   - url: https://github.com/prooph/event-store
     tags: [php, event-store]
@@ -84,6 +87,7 @@ github_repos:
   - url: https://github.com/eventmodeling/eventmodeling.org
     tags: [event-modeling, design, concepts]
     description: "Event Modeling — methodology for designing event-driven systems"
+    clone: false  # Website/documentation repo, no ES code
 
   # Python
   - url: https://github.com/pyeventsourcing/eventsourcing

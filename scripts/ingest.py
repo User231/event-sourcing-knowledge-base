@@ -13,6 +13,7 @@ from chromadb.utils import embedding_functions
 sys.path.insert(0, os.path.dirname(__file__))
 from fetch_web import fetch_all_articles
 from fetch_github import fetch_all_repos
+from index_code import load_code_docs
 
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
@@ -50,7 +51,7 @@ def chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVE
 
 
 def make_doc_id(source: str, chunk_idx: int) -> str:
-    source_hash = hashlib.md5(source.encode()).hexdigest()[:12]
+    source_hash = hashlib.md5(source.encode()).hexdigest()
     return f"{source_hash}_chunk_{chunk_idx}"
 
 
@@ -89,13 +90,13 @@ def ingest():
     all_docs = []
 
     # 1. Local markdown files
-    print("\n[1/3] Loading local markdown files...")
+    print("\n[1/4] Loading local markdown files...")
     md_docs = load_markdown_files()
     print(f"  Found {len(md_docs)} markdown files")
     all_docs.extend(md_docs)
 
     # 2. Web articles
-    print("\n[2/3] Fetching web articles...")
+    print("\n[2/4] Fetching web articles...")
     articles = fetch_all_articles(sources.get("articles", []))
     for article in articles:
         all_docs.append({
@@ -108,8 +109,8 @@ def ingest():
         })
     print(f"  Fetched {len(articles)} articles")
 
-    # 3. GitHub repos
-    print("\n[3/3] Fetching GitHub repositories...")
+    # 3. GitHub repo READMEs
+    print("\n[3/4] Fetching GitHub repository READMEs...")
     repos = fetch_all_repos(sources.get("github_repos", []))
     for repo in repos:
         all_docs.append({
@@ -120,31 +121,75 @@ def ingest():
             "tags": repo.get("tags", []),
             "title": repo.get("title", repo["url"]),
         })
-    print(f"  Fetched {len(repos)} repos")
+    print(f"  Fetched {len(repos)} repo READMEs")
+
+    # 4. Cloned repo source code
+    print("\n[4/4] Indexing cloned repository source code...")
+    code_docs = load_code_docs()
+    for code_doc in code_docs:
+        all_docs.append({
+            "content": code_doc["content"],
+            "source": code_doc["source"],
+            "source_type": code_doc["source_type"],
+            "category": code_doc["category"],
+            "tags": code_doc.get("tags", []),
+            "title": code_doc["title"],
+            "language": code_doc.get("language", ""),
+            "file_path": code_doc.get("file_path", ""),
+            "repo": code_doc.get("repo", ""),
+            "chunk_index": code_doc.get("chunk_index", 0),
+        })
 
     # Chunk all documents
     print(f"\nChunking {len(all_docs)} documents...")
     all_chunks = []
     all_metadatas = []
     all_ids = []
+    seen_ids = set()
 
     for doc in all_docs:
-        chunks = chunk_text(doc["content"])
+        # Code docs are already pre-chunked by index_code.py
+        if doc["source_type"] == "github_code":
+            chunks = [doc["content"]]
+            chunk_offset = doc.get("chunk_index", 0)
+        else:
+            chunks = chunk_text(doc["content"])
+            chunk_offset = 0
+
         for i, chunk in enumerate(chunks):
-            doc_id = make_doc_id(doc["source"], i)
+            # Use file_path for code docs to avoid ID collisions
+            if doc["source_type"] == "github_code":
+                id_source = doc.get("repo", "") + ":" + doc.get("file_path", "") + ":" + str(chunk_offset + i)
+            else:
+                id_source = doc["source"] + ":" + str(chunk_offset + i)
+            doc_id = make_doc_id(id_source, chunk_offset + i)
+
+            # Skip duplicates
+            if doc_id in seen_ids:
+                continue
+            seen_ids.add(doc_id)
+
             all_chunks.append(chunk)
-            all_metadatas.append({
+            metadata = {
                 "source": doc["source"],
                 "source_type": doc["source_type"],
                 "category": doc["category"],
                 "tags": ",".join(doc.get("tags", [])),
                 "title": doc["title"],
-                "chunk_index": i,
+                "chunk_index": chunk_offset + i,
                 "total_chunks": len(chunks),
-            })
+            }
+            # Add code-specific metadata
+            if doc.get("language"):
+                metadata["language"] = doc["language"]
+            if doc.get("file_path"):
+                metadata["file_path"] = doc["file_path"]
+            if doc.get("repo"):
+                metadata["repo"] = doc["repo"]
+            all_metadatas.append(metadata)
             all_ids.append(doc_id)
 
-    print(f"  Total chunks: {len(all_chunks)}")
+    print(f"  Total chunks: {len(all_chunks)} (deduplicated from {len(seen_ids) + (len(all_docs) - len(all_chunks))})")
 
     # Initialize ChromaDB with sentence-transformer embeddings
     print("\nInitializing ChromaDB...")

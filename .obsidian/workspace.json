@@ -185,6 +185,16 @@
   },
   "active": "ab4de391e7772b8e",
   "lastOpenFiles": [
+    "chroma_db/5fabf087-e9f6-4b7d-abf8-2b1f44555085/link_lists.bin",
+    "chroma_db/5fabf087-e9f6-4b7d-abf8-2b1f44555085/length.bin",
+    "chroma_db/5fabf087-e9f6-4b7d-abf8-2b1f44555085/header.bin",
+    "chroma_db/5fabf087-e9f6-4b7d-abf8-2b1f44555085/data_level0.bin",
+    "chroma_db/5fabf087-e9f6-4b7d-abf8-2b1f44555085",
+    "chroma_db/chroma.sqlite3-journal",
+    "ingested_sources/github/NickTsitlakidis_event-nest/combined.md",
+    "ingested_sources/github/NickTsitlakidis_event-nest",
+    "ingested_sources/github/ocoda_event-sourcing/combined.md",
+    "ingested_sources/github/ocoda_event-sourcing",
     "knowledge_base/concepts/core-concepts.md"
   ]
 }

@@ -30,22 +30,29 @@ python scripts/query.py "How do I handle event versioning?"
 ## Adding Your Own Sources
 
 ### Markdown notes
+
 Drop `.md` files into any folder under `knowledge_base/`. Then re-run ingestion:
+
 ```bash
 python scripts/ingest.py
 ```
 
 ### Web articles
+
 Add URLs to `sources.yaml` under the `articles:` section:
+
 ```yaml
 articles:
   - url: https://example.com/great-event-sourcing-article
     tags: [patterns, cqrs]
 ```
+
 Then re-run ingestion.
 
 ### GitHub repositories
+
 Add repos to `sources.yaml` under `github_repos:`:
+
 ```yaml
 github_repos:
   - url: https://github.com/owner/repo

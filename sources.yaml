@@ -94,3 +94,12 @@ github_repos:
   - url: https://github.com/castore-dev/castore
     tags: [typescript, library]
     description: "Castore — TypeScript library for Event Sourcing"
+
+  - url: https://github.com/ocoda/event-sourcing
+    docs: https://ocoda.github.io/event-sourcing/start/repositories
+    tags: [nestjs, typescript, library]
+    description: "Ocoda Event Sourcing — NestJS ES library (good docs, less actively maintained)"
+
+  - url: https://github.com/NickTsitlakidis/event-nest
+    tags: [nestjs, typescript, library, postgresql, mongodb]
+    description: "EventNest — NestJS event sourcing library with PostgreSQL & MongoDB support"

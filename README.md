@@ -16,8 +16,8 @@ A local, self-hosted knowledge base for event sourcing architecture — powered 
 # 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Set your Anthropic API key
-export ANTHROPIC_API_KEY="sk-ant-..."
+# 2. Activate virtual environment
+source .venv/bin/activate
 
 # 3. Clone GitHub repos (source code for code search)
 python scripts/clone_repos.py
@@ -66,8 +66,8 @@ github_repos:
   - url: https://github.com/owner/repo
     description: "Short description of what this repo demonstrates"
     tags: [python, example]
-    clone: true              # Set to false to skip cloning source code
-    code_paths: ["src/"]     # Optional: scope indexing to specific directories
+    clone: true # Set to false to skip cloning source code
+    code_paths: ["src/"] # Optional: scope indexing to specific directories
 ```
 
 Then clone and re-ingest:

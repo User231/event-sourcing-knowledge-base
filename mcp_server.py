@@ -10,7 +10,7 @@ PROJECT_ROOT = os.path.dirname(__file__)
 CHROMA_DIR = os.path.join(PROJECT_ROOT, "chroma_db")
 COLLECTION_NAME = "event_sourcing_kb"
 
-mcp = FastMCP("event-sourcing-kb")
+mcp = FastMCP("event-sourcing-knowlege-base")
 
 _collection = None
 

@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "event-sourcing-kb": {
+    "event-sourcing-knowlege-base": {
       "type": "stdio",
       "command": ".venv/bin/python",
       "args": [

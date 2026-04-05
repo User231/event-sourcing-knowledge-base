@@ -80,7 +80,7 @@ python scripts/ingest.py
 ## Project Structure
 
 ```
-event-sourcing-kb/
+event-sourcing-knowlege-base/
 ├── knowledge_base/          # Your markdown knowledge files
 │   ├── concepts/            # Core ES concepts
 │   ├── patterns/            # Implementation patterns
@@ -115,3 +115,7 @@ event-sourcing-kb/
 - Run `python scripts/search_code.py --language csharp "your query"` to filter code by language
 - Run `python scripts/clone_repos.py --pull` to update cloned repos
 - The vector DB lives in `./chroma_db/` — delete it and re-ingest to rebuild from scratch
+
+## Make mcp available user wide - from other projects
+
+Run `python scripts/inject_mcp.py` to inject the MCP server into the user's `.claude.json` file.

@@ -1,80 +1,115 @@
-# Event Sourcing Knowledge Base (RAG)
+# Event Sourcing Knowledge Base
 
-A local, self-hosted knowledge base for event sourcing architecture — powered by ChromaDB + Anthropic Claude.
+A local, semantic knowledge base for event sourcing architecture — powered by [repo-rag](https://github.com/user/repo-rag) (Qdrant + nomic-embed-text + tree-sitter).
 
 ## What This Does
 
-- **Indexes** markdown notes, web articles, GitHub repo docs, and **actual source code** into a local vector store
-- **Searches** across all sources with semantic similarity (not just keyword matching)
-- **Code Search** — find real coding examples across 13+ event sourcing repos (aggregates, snapshots, projections, etc.)
-- **Answers** natural-language questions using RAG (Retrieval-Augmented Generation) via Claude
-- **Grows** with you — add your own notes, articles, and repos over time
+- **Indexes** markdown notes, web articles, GitHub repo docs, and source code into a Qdrant vector store
+- **Hybrid search** across all sources — semantic similarity + BM25 keyword matching with RRF fusion
+- **Code search** — find real implementations across 13+ event sourcing repos (aggregates, snapshots, projections, etc.)
+- **MCP server** — Claude Code can search the knowledge base directly via tool calls
+- **Auto-reindex** — the MCP server detects git changes and incrementally updates the index
+
+## Prerequisites
+
+- [repo-rag](~/git/my/repo-rag) installed (`pip install -e ~/git/my/repo-rag`)
+- Qdrant running (`docker compose -f ~/git/my/repo-rag/docker-compose.yaml up -d`)
 
 ## Quick Start
 
 ```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+# Index everything (local docs, web articles, GitHub repos + code)
+repo-rag index --force
 
-# 2. Activate virtual environment
-source .venv/bin/activate
+# Search from terminal
+repo-rag search "What is event sourcing and when should I use it?"
+repo-rag search "aggregate pattern" --code-only
+repo-rag search "snapshot" --language csharp
 
-# 3. Clone GitHub repos (source code for code search)
-python scripts/clone_repos.py
+# Check what's indexed
+repo-rag info
 
-# 4. Ingest everything (markdown, articles, READMEs, source code)
-python scripts/ingest.py
-
-# 5. Ask questions (RAG with Claude)
-python scripts/query.py "What is event sourcing and when should I use it?"
-python scripts/query.py "Compare EventStoreDB vs Marten for .NET"
-
-# 6. Search for code examples
-python scripts/search_code.py "restoring aggregate state from snapshot"
-python scripts/search_code.py --language csharp "event upcasting"
-python scripts/search_code.py --language typescript "aggregate root"
+# Start MCP server (for Claude Code integration)
+repo-rag serve
 ```
 
-## Adding Your Own Sources
+## Managing Sources
 
-### Markdown notes
+All sources are configured in `repo-rag.yaml`. After any change, re-run `repo-rag index --force`.
 
-Drop `.md` files into any folder under `knowledge_base/`. Then re-run ingestion:
+### Local markdown notes
 
-```bash
-python scripts/ingest.py
-```
+Drop `.md` files into any folder under `knowledge_base/`. They're picked up automatically by the `local` source.
 
 ### Web articles
 
-Add URLs to `sources.yaml` under the `articles:` section:
+Add URLs under the `web:` section in `repo-rag.yaml`:
 
 ```yaml
-articles:
-  - url: https://example.com/great-event-sourcing-article
-    tags: [patterns, cqrs]
+sources:
+  web:
+    - url: https://example.com/great-event-sourcing-article
+      tags: [patterns, cqrs]
 ```
 
-Then re-run ingestion.
+Fetched articles are cached in `.repo-rag/web/`. To re-fetch all articles (e.g. if content changed), delete the cache and re-index:
+
+```bash
+rm -rf .repo-rag/web/
+repo-rag index --force
+```
 
 ### GitHub repositories
 
-Add repos to `sources.yaml` under `github_repos:`:
+Add repos under the `github:` section in `repo-rag.yaml`:
 
 ```yaml
-github_repos:
-  - url: https://github.com/owner/repo
-    description: "Short description of what this repo demonstrates"
-    tags: [python, example]
-    clone: true # Set to false to skip cloning source code
-    code_paths: ["src/"] # Optional: scope indexing to specific directories
+sources:
+  github:
+    - url: https://github.com/owner/repo
+      tags: [python, example]
+      clone: true                    # Set to false for README-only indexing
+      code_paths: ["src/"]           # Optional: scope to specific directories
 ```
 
-Then clone and re-ingest:
+- **`clone: true`** — shallow-clones the repo to `.repo-rag/repos/` and indexes source code files
+- **`clone: false`** — only fetches the README and key docs, no code indexing
+- **`code_paths`** — limits which directories get indexed (useful for large repos where only specific paths have relevant code)
+
+GitHub READMEs are cached in `.repo-rag/github/`.
+
+### Removing a source
+
+1. Remove the entry from `repo-rag.yaml`
+2. Run `repo-rag index --force` to rebuild the index without it
+3. Optionally clean up the cache:
 
 ```bash
-python scripts/clone_repos.py
-python scripts/ingest.py
+# Remove a specific cloned repo
+rm -rf .repo-rag/repos/owner_repo
+
+# Remove a cached web article (find filename by URL slug)
+ls .repo-rag/web/
+rm .repo-rag/web/example_com_*.md
+
+# Remove a cached GitHub README
+rm -rf .repo-rag/github/owner_repo
+```
+
+### Updating cached content
+
+```bash
+# Re-fetch all web articles
+rm -rf .repo-rag/web/
+repo-rag index --force
+
+# Re-clone all GitHub repos (get latest code)
+rm -rf .repo-rag/repos/
+repo-rag index --force
+
+# Nuclear option: clear everything and rebuild
+rm -rf .repo-rag/
+repo-rag index --force
 ```
 
 ## Project Structure
@@ -86,36 +121,31 @@ event-sourcing-knowlege-base/
 │   ├── patterns/            # Implementation patterns
 │   ├── libraries/           # Library guides & comparisons
 │   └── languages/           # Language-specific strategies
-├── scripts/
-│   ├── ingest.py            # Ingest all sources into ChromaDB
-│   ├── query.py             # CLI query interface (RAG + Claude)
-│   ├── search_code.py       # Search for code examples
-│   ├── clone_repos.py       # Clone GitHub repos for code indexing
-│   ├── index_code.py        # Index source code files
-│   ├── fetch_web.py         # Fetch & extract article content
-│   └── fetch_github.py      # Fetch GitHub repo READMEs/docs
-├── repos_cloned/            # Shallow-cloned GitHub repos (gitignored)
-├── ingested_sources/        # Cache of fetched web/GitHub content
-├── sources.yaml             # External sources registry
-├── requirements.txt
+├── repo-rag.yaml            # Source configuration
+├── .mcp.json                # MCP server config for Claude Code
 └── README.md
 ```
 
+Cache and index data locations:
+
+| Data | Location |
+|---|---|
+| Vector index | Qdrant Docker volume (http://localhost:6333/dashboard) |
+| Web article cache | `.repo-rag/web/` |
+| GitHub README cache | `.repo-rag/github/` |
+| Cloned repos | `.repo-rag/repos/` |
+| Index state | `.repo-rag/.state` |
+
 ## How It Works
 
-1. **Ingestion** splits all sources into overlapping chunks, embeds them using a local sentence-transformer model, and stores them in a ChromaDB collection.
-2. **Querying** embeds your question, retrieves the top-k most relevant chunks, and sends them as context to Claude with your question.
-3. **Sources are tagged** with metadata (type, language, tags) so you can filter queries if needed.
+1. **Indexing** scans all sources, chunks code with tree-sitter (AST-aware: functions, classes as units) and docs by paragraphs, embeds with nomic-embed-text-v1.5, and stores in Qdrant with dense + BM25 sparse vectors.
+2. **Searching** uses hybrid retrieval — semantic similarity and keyword matching fused with Reciprocal Rank Fusion (RRF).
+3. **Incremental updates** — on subsequent `repo-rag index` calls, only files changed since the last git commit are re-indexed.
+4. **MCP auto-reindex** — when Claude Code calls a search tool, the server checks if git HEAD has moved and incrementally updates before searching.
 
 ## Tips
 
-- Run `python scripts/query.py --list-sources` to see everything indexed
-- Run `python scripts/query.py --filter-tag python "your question"` to scope results
-- Run `python scripts/search_code.py --list-languages` to see what code is indexed
-- Run `python scripts/search_code.py --language csharp "your query"` to filter code by language
-- Run `python scripts/clone_repos.py --pull` to update cloned repos
-- The vector DB lives in `./chroma_db/` — delete it and re-ingest to rebuild from scratch
-
-## Make mcp available user wide - from other projects
-
-Run `python scripts/inject_mcp.py` to inject the MCP server into the user's `.claude.json` file.
+- Run `repo-rag info` to see chunk counts by source type and language
+- Use `--code-only` flag to search only code (no docs/articles)
+- Use `--language python` to filter code by language
+- Visit http://localhost:6333/dashboard to browse the Qdrant collection visually

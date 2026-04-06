@@ -2,9 +2,11 @@
   "mcpServers": {
     "event-sourcing-knowlege-base": {
       "type": "stdio",
-      "command": ".venv/bin/python",
+      "command": "repo-rag",
       "args": [
-        "mcp_server.py"
+        "serve",
+        "--config",
+        "repo-rag.yaml"
       ],
       "env": {}
     }

@@ -1,12 +1,22 @@
 {
   "mcpServers": {
-    "event-sourcing-knowlege-base": {
+    "codegraph": {
       "type": "stdio",
-      "command": "repo-rag",
+      "command": "codegraph",
       "args": [
         "serve",
-        "--config",
-        "repo-rag.yaml"
+        "--mcp"
+      ]
+    },
+    "serena": {
+      "type": "stdio",
+      "command": "serena",
+      "args": [
+        "start-mcp-server",
+        "--context",
+        "claude-code",
+        "--project",
+        "."
       ],
       "env": {}
     }

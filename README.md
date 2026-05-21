@@ -1,116 +1,58 @@
 # Event Sourcing Knowledge Base
 
-A local, semantic knowledge base for event sourcing architecture — powered by [repo-rag](https://github.com/user/repo-rag) (Qdrant + nomic-embed-text + tree-sitter).
+A local knowledge base for event sourcing — markdown notes plus a curated set of cloned reference repositories — made queryable in Claude Code via two MCP servers: [Serena](https://github.com/oraios/serena) (LSP-backed symbol intelligence) and [Codegraph](https://github.com/codegraph/codegraph) (SQLite knowledge graph of symbols + edges).
 
 ## What This Does
 
-- **Indexes** markdown notes, web articles, GitHub repo docs, and source code into a Qdrant vector store
-- **Hybrid search** across all sources — semantic similarity + BM25 keyword matching with RRF fusion
-- **Code search** — find real implementations across 13+ event sourcing repos (aggregates, snapshots, projections, etc.)
-- **MCP server** — Claude Code can search the knowledge base directly via tool calls
-- **Auto-reindex** — the MCP server detects git changes and incrementally updates the index
+- **Markdown notes** in `knowledge_base/` for concepts, patterns, libraries, and language-specific guides.
+- **Reference implementations** in `repos_cloned/` — 13 event sourcing libraries and example repos across C#, Java/Kotlin, TypeScript, Python, Elixir, PHP, and Rust. Tracked in this repo so Claude Code can navigate them.
+- **Serena MCP** — symbol-aware code navigation across `knowledge_base/` and `repos_cloned/` via language servers (find symbol, find references, rename, edit by symbol).
+- **Codegraph MCP** — pre-built knowledge graph of every symbol, edge, and file; sub-millisecond lookups for callers/callees/impact/context.
 
 ## Prerequisites
 
-- [repo-rag](~/git/my/repo-rag) installed (`pip install -e ~/git/my/repo-rag`)
-- Qdrant running (`docker compose -f ~/git/my/repo-rag/docker-compose.yaml up -d`)
+- [Serena](https://github.com/oraios/serena) installed and on PATH as `serena`
+- [Codegraph](https://github.com/codegraph/codegraph) installed and on PATH as `codegraph`
+- For Serena symbol tools to work on a given repo, the corresponding language server must be available locally. Serena auto-installs most of these; see [Serena's language servers docs](https://oraios.github.io/serena/01-about/020_programming-languages.html#language-servers) for any that need manual setup (notably C#/Java/Kotlin can require extra steps).
 
 ## Quick Start
 
-```bash
-# Index everything (local docs, web articles, GitHub repos + code)
-repo-rag index --force
+Both MCP servers are wired up in `.mcp.json` and start automatically when you open this folder in Claude Code. Just ask:
 
-# Search from terminal
-repo-rag search "What is event sourcing and when should I use it?"
-repo-rag search "aggregate pattern" --code-only
-repo-rag search "snapshot" --language csharp
+- "Where is the `Aggregate` base class defined in Marten?"
+- "Show me how `commanded` handles snapshotting."
+- "What calls `apply_event` across the Python eventsourcing library?"
 
-# Check what's indexed
-repo-rag info
-
-# Start MCP server (for Claude Code integration)
-repo-rag serve
-```
+Claude Code will route those to Codegraph (for graph-style lookups) or Serena (for symbol-aware reads/edits).
 
 ## Managing Sources
 
-All sources are configured in `repo-rag.yaml`. After any change, re-run `repo-rag index --force`.
-
 ### Local markdown notes
 
-Drop `.md` files into any folder under `knowledge_base/`. They're picked up automatically by the `local` source.
+Drop `.md` files anywhere under `knowledge_base/`. Serena and Codegraph pick them up via filesystem traversal — no manual indexing step. Codegraph's watcher reflects edits within roughly a second.
 
-### Web articles
+### Cloned reference repos
 
-Add URLs under the `web:` section in `repo-rag.yaml`:
+Repos live under `repos_cloned/<owner>_<repo>/` and are committed to this repository so the knowledge base is self-contained.
 
-```yaml
-sources:
-  web:
-    - url: https://example.com/great-event-sourcing-article
-      tags: [patterns, cqrs]
-```
-
-Fetched articles are cached in `.repo-rag/web/`. To re-fetch all articles (e.g. if content changed), delete the cache and re-index:
+To add a new repo:
 
 ```bash
-rm -rf .repo-rag/web/
-repo-rag index --force
+git clone --depth 1 https://github.com/<owner>/<repo>.git \
+  repos_cloned/<owner>_<repo>
+rm -rf repos_cloned/<owner>_<repo>/.git
+git add repos_cloned/<owner>_<repo>
 ```
 
-### GitHub repositories
+(Stripping `.git` keeps it a plain directory tree rather than a submodule.)
 
-Add repos under the `github:` section in `repo-rag.yaml`:
+To refresh a repo, delete the directory and re-clone with the steps above.
 
-```yaml
-sources:
-  github:
-    - url: https://github.com/owner/repo
-      tags: [python, example]
-      clone: true                    # Set to false for README-only indexing
-      code_paths: ["src/"]           # Optional: scope to specific directories
-```
+To remove a repo, just `rm -rf` its directory and commit.
 
-- **`clone: true`** — shallow-clones the repo to `.repo-rag/repos/` and indexes source code files
-- **`clone: false`** — only fetches the README and key docs, no code indexing
-- **`code_paths`** — limits which directories get indexed (useful for large repos where only specific paths have relevant code)
+### Serena project config
 
-GitHub READMEs are cached in `.repo-rag/github/`.
-
-### Removing a source
-
-1. Remove the entry from `repo-rag.yaml`
-2. Run `repo-rag index --force` to rebuild the index without it
-3. Optionally clean up the cache:
-
-```bash
-# Remove a specific cloned repo
-rm -rf .repo-rag/repos/owner_repo
-
-# Remove a cached web article (find filename by URL slug)
-ls .repo-rag/web/
-rm .repo-rag/web/example_com_*.md
-
-# Remove a cached GitHub README
-rm -rf .repo-rag/github/owner_repo
-```
-
-### Updating cached content
-
-```bash
-# Re-fetch all web articles
-rm -rf .repo-rag/web/
-repo-rag index --force
-
-# Re-clone all GitHub repos (get latest code)
-rm -rf .repo-rag/repos/
-repo-rag index --force
-
-# Nuclear option: clear everything and rebuild
-rm -rf .repo-rag/
-repo-rag index --force
-```
+[.serena/project.yml](.serena/project.yml) lists the languages Serena should start language servers for. Edit the `languages:` list there if you add a repo in a language not yet covered.
 
 ## Project Structure
 
@@ -118,34 +60,27 @@ repo-rag index --force
 event-sourcing-knowlege-base/
 ├── knowledge_base/          # Your markdown knowledge files
 │   ├── concepts/            # Core ES concepts
-│   ├── patterns/            # Implementation patterns
-│   ├── libraries/           # Library guides & comparisons
-│   └── languages/           # Language-specific strategies
-├── repo-rag.yaml            # Source configuration
-├── .mcp.json                # MCP server config for Claude Code
+│   ├── implementation-patterns/
+│   ├── patterns/
+│   ├── libraries/
+│   └── languages/
+├── repos_cloned/            # Reference implementations (committed)
+│   ├── AxonFramework_AxonFramework/
+│   ├── JasperFx_marten/
+│   └── ...
+├── .mcp.json                # MCP server config (serena + codegraph)
+├── .serena/project.yml      # Serena language list and ignores
 └── README.md
 ```
 
-Cache and index data locations:
-
-| Data | Location |
-|---|---|
-| Vector index | Qdrant Docker volume (http://localhost:6333/dashboard) |
-| Web article cache | `.repo-rag/web/` |
-| GitHub README cache | `.repo-rag/github/` |
-| Cloned repos | `.repo-rag/repos/` |
-| Index state | `.repo-rag/.state` |
-
 ## How It Works
 
-1. **Indexing** scans all sources, chunks code with tree-sitter (AST-aware: functions, classes as units) and docs by paragraphs, embeds with nomic-embed-text-v1.5, and stores in Qdrant with dense + BM25 sparse vectors.
-2. **Searching** uses hybrid retrieval — semantic similarity and keyword matching fused with Reciprocal Rank Fusion (RRF).
-3. **Incremental updates** — on subsequent `repo-rag index` calls, only files changed since the last git commit are re-indexed.
-4. **MCP auto-reindex** — when Claude Code calls a search tool, the server checks if git HEAD has moved and incrementally updates before searching.
+1. **Serena** runs a language server per configured language and exposes symbol-level tools (`find_symbol`, `find_referencing_symbols`, `replace_symbol_body`, etc.) over MCP. Best for "edit this method" or "where is X referenced."
+2. **Codegraph** maintains a SQLite knowledge graph of every symbol, edge, and file in the workspace, updated incrementally by a file watcher. Best for "what calls this," "blast radius of changing X," and broad area-context queries.
+3. Both servers respect `.gitignore`, so anything ignored (e.g. `.venv/`) is invisible to them. `repos_cloned/` is **not** ignored, so its contents are fully indexed.
 
 ## Tips
 
-- Run `repo-rag info` to see chunk counts by source type and language
-- Use `--code-only` flag to search only code (no docs/articles)
-- Use `--language python` to filter code by language
-- Visit http://localhost:6333/dashboard to browse the Qdrant collection visually
+- Ask Codegraph first for "where is X" / "what calls Y" — it's faster and broader than grep.
+- Use Serena when you need to read or modify a specific symbol's body.
+- If Serena reports a language server failure for a given repo, check that the LSP for that language is installed on your system.

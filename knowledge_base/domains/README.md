@@ -13,6 +13,7 @@ Per the core rule (see [../concepts/core-concepts.md](../concepts/core-concepts.
 | [food-ordering-and-delivery.md](food-ordering-and-delivery.md) | Food delivery, grocery, restaurant POS integration (DoorDash, Uber Eats, Wolt, Instacart, Toast, Olo) |
 | [ecommerce-and-retail.md](ecommerce-and-retail.md) | Retail commerce, marketplaces, B2B platforms, inventory (Walmart, Shopify, Salesforce B2C, Zalando, ASOS, Mercado Libre) |
 | [hotel-and-hospitality.md](hotel-and-hospitality.md) | PMS, OTA distribution, channel managers, group bookings (Booking.com, Mews, Marriott; Dudycz's canonical HotelManagement sample) |
+| [unbounded-and-infinite-streams.md](unbounded-and-infinite-streams.md) | Cross-cutting taxonomy: domains where streams have no natural close (collab docs, chat, EHR, IoT, blockchain, social feeds) and the patterns that bound them |
 
 ## Patterns that recur across every domain
 
@@ -38,7 +39,7 @@ Distilled from Vaughn Vernon's [Effective Aggregate Design](https://www.dddcommu
 - **Different audit/compliance scope → different aggregate.** PCI scope, KYC scope, GDPR scope, GAAP scope.
 - **Different actor / team owns it → different aggregate.** Distribution team owns Reservation; front-desk team owns GuestStay.
 
-When in doubt, split. Merging two streams later is harder than the other direction.
+**When in doubt, lean larger.** Splitting later means introducing a saga and relaxing an invariant you used to enforce — both reversible but invasive. Merging two streams later is closer to a one-time data migration. Most teams over-split early because "aggregates should be small" sounds prudent; they then spend a year reintroducing coordination they didn't need. The signals above are when to commit to a split, not a license to split on suspicion.
 
 ## Where to look in the cloned repos
 

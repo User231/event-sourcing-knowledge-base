@@ -1,8 +1,6 @@
 """Fetch README and docs from GitHub repositories."""
 
 import os
-import re
-import hashlib
 import requests
 
 
@@ -126,11 +124,16 @@ def fetch_all_repos(repos: list[dict], force: bool = False) -> list[dict]:
 
 
 if __name__ == "__main__":
+    import argparse
     import yaml
+
+    parser = argparse.ArgumentParser(description="Fetch and cache GitHub READMEs listed in sources.yaml")
+    parser.add_argument("--force", action="store_true", help="Re-fetch even if a cached copy already exists")
+    args = parser.parse_args()
 
     sources_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "sources.yaml")
     with open(sources_path) as f:
         sources = yaml.safe_load(f)
 
-    repos = fetch_all_repos(sources.get("github_repos", []))
+    repos = fetch_all_repos(sources.get("github_repos", []), force=args.force)
     print(f"\nFetched {len(repos)} repos")

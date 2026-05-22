@@ -86,11 +86,16 @@ def fetch_all_articles(articles: list[dict], force: bool = False) -> list[dict]:
 
 
 if __name__ == "__main__":
+    import argparse
     import yaml
+
+    parser = argparse.ArgumentParser(description="Fetch and cache web articles listed in sources.yaml")
+    parser.add_argument("--force", action="store_true", help="Re-fetch even if a cached copy already exists")
+    args = parser.parse_args()
 
     sources_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "sources.yaml")
     with open(sources_path) as f:
         sources = yaml.safe_load(f)
 
-    articles = fetch_all_articles(sources.get("articles", []))
+    articles = fetch_all_articles(sources.get("articles", []), force=args.force)
     print(f"\nFetched {len(articles)} articles")

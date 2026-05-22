@@ -14,6 +14,7 @@ Per the core rule (see [../concepts/core-concepts.md](../concepts/core-concepts.
 | [ecommerce-and-retail.md](ecommerce-and-retail.md) | Retail commerce, marketplaces, B2B platforms, inventory (Walmart, Shopify, Salesforce B2C, Zalando, ASOS, Mercado Libre) |
 | [hotel-and-hospitality.md](hotel-and-hospitality.md) | PMS, OTA distribution, channel managers, group bookings (Booking.com, Mews, Marriott; Dudycz's canonical HotelManagement sample) |
 | [unbounded-and-infinite-streams.md](unbounded-and-infinite-streams.md) | Cross-cutting taxonomy: domains where streams have no natural close (collab docs, chat, EHR, IoT, blockchain, social feeds) and the patterns that bound them |
+| [spreadsheets.md](spreadsheets.md) | Collaborative spreadsheets — grid-as-document vs row-as-record vs dimensional models, formula dependency graphs, OT/CRDT/LWW collaboration, recompute sagas (Google Sheets, Excel Online, Airtable, Notion, EtherCalc, HyperFormula, Causal) |
 
 ## Patterns that recur across every domain
 

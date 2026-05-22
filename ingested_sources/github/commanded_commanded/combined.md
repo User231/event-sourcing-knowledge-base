@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/commanded/commanded
 - **Description**: Commanded — CQRS/ES framework for Elixir
-- **Stars**: 1998
+- **Stars**: 2010
 - **Primary Language**: Elixir
 
 ---

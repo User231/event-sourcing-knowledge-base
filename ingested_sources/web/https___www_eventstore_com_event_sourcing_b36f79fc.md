@@ -1,230 +1,321 @@
-# Introduction to Event Sourcing | Kurrent
+# Event Sourcing Database â Built for It, Not Bolted On
 
 Source: https://www.eventstore.com/event-sourcing
 
-# Introduction to Event Sourcing
+# The only database purpose-built for event sourcing.
 
-The Architectural Pattern for Highly Adaptive, Auditable, and AI-Ready Business Applications
+Stop building an event store from scratch. Start with one that's already complete.
 
-[Play](https://youtube.com/watch?v=mZAWsvym43Q)
+Start Free Trial
 
-## Event Sourcing in 4 minutes
+## Free Trial
 
-Learn the big picture and fundamentals of event sourcing in this short video
+  Request Trial License
 
-[Watch the Full Video here](https://www.youtube.com/watch?v=mZAWsvym43Q&list=PLWG5TK2D4U_N3hiOYPu40FiYF7-quXp9X&index=1)
+### Stop fighting
 
-[ð Get Started with Event Sourcing](https://docs.kurrent.io/getting-started/introduction.html)
+Immutability, ordering, streaming, and projections are native capabilitiesânot bolted on like with CRUD databases.
 
-[ð Explore Event Sourcing Resources](/resources/eventsourcing)
+### Ship faster
 
-## Why Developers are Adopting Event Sourcing
+No designing schemas, building subscriptions, or debugging concurrency. Start with a working event store on day one.
 
-Modernize monolithic and tightly coupled applications and databases
+### Simplify your stack
 
-Fuel contextual AI and analytics with rich and auditable historical data
+One purpose-built platform instead of five. Fewer moving parts, fewer failure modes.
 
-[Learn more in this 30-min "Why Event Sourcing" video](/blog/why-event-sourcing/)
+## 50M+
 
-## Challenges of Business Application Development
+DOWNLOADS
 
-### Monolithic Application and Shared Data Models
+## F500
 
-* Monolithic applications often force business logic to use shared data models
-* If any business logic or model changes, everything has to change
-* This dependency makes it challenging to scale and decouple the monolith
+DEPLOYMENTS
 
-### Context Loss in Operational Databases
+## Î¼s
 
-* Operational databases often only keep the current version of each record to maximize performance and minimize storage costs
-* This approach overwrites historical snapshots, erasing previous states with every update and delete
-* As a result, valuable historical context is lost, making it difficult to support advanced AI and analytics
+LATENCY
 
-## Event Sourcing 101
+## 99.9%
 
-1
+UPTIME
 
-### Append domain events to the event store
+## SOC 2
 
-Every change in the application is captured as a domain event and appended to an event store.
+CERTIFIED
 
-2
+The Problem 
 
-### Replay events with a projection
+## "I feel like I'm battling my database"
 
-Another application can replay these events from the event store using a projection.
+When organizations implement event sourcing with general-purpose databases like PostgreSQL, MongoDB, or Cassandra, they quickly discover these databases weren't designed for event-driven patterns. What starts as "we'll just store events in a table" becomes months of custom development across six critical areas.
 
-3
+### Schema & Data Model Design
 
-### Build a custom data model
+General-purpose databases have no native concept of event streams. Teams design custom schemas from scratchâevent tables with aggregate IDs, sequence numbers, and payload columns.
 
-The projection builds a custom data model optimized for a specific use case, in any database or schema.
+### Third-Party Libraries or Custom Code
 
-### Domain Event
+Without native support, teams adopt third-party libraries or build custom implementations. Either path means your event store is only as reliable as non-core code.
 
-A business event representing a change in the application, modeled in language familiar to business stakeholders rather than technical details.
+### Ordering & Consistency Guarantees
 
-[Learn more](https://docs.kurrent.io/getting-started/concepts.html#event)
+Event sourcing depends on strict orderingâwithin streams and globally. General-purpose databases don't provide this automatically. Teams must implement sequence generation and handle failures.
 
-### Event Store
+### Concurrency Control
 
-An append-only database that records every event in sequence, preserving a complete and permanent log of changes. KurrentDB is an example of an event store.
+When multiple processes append events simultaneously, you need optimistic concurrency control. General-purpose databases require custom implementationâerror-prone code with silent data corruption as the consequence.
 
-[Learn more](https://docs.kurrent.io/getting-started/concepts.html#event-log)
+### Real-Time Streaming Infrastructure
 
-### Projection
+General-purpose databases offer limited or no native streaming. Teams bolt on external message brokersâdoubling operational complexity and creating synchronization challenges.
 
-A function that constructs a data model by sequentially replaying events from the event store.
+### Projection & Read Model Management
 
-[Watch this Video for the Basics](https://www.youtube.com/watch?v=AEbBCjo-WGM&list=PLWG5TK2D4U_N3hiOYPu40FiYF7-quXp9X&index=2)
+Events need transformation into read models. General-purpose databases require external frameworks, custom microservices, or batch jobsâplus checkpoint management and synchronization logic.
 
-[Read this for an In-Depth Explanation](/resources/eventsourcing/what-is-event-sourcing/)
+## Building an Event Store is a Burden
 
-[Take this Course for the Essentials](https://academy.kurrent.io/essentials)
+Specialized Knowledge
 
-## Decouple Monolithic Applications with Event Sourcing
+Development Time
 
-### Separate Data Model from your Business Logic
+Ongoing Maintenance
 
-Domain events are not strongly tied to any specific data model, database, or schema, which helps separate the business logic from the data model.
+Infrastructure Focus
 
-### Modularize Monolithic Application to Services
+System Fragility
 
-Monolithic applications can be decoupled into independent vertical slices for microservices or modular monoliths that are easier to evolve, scale, and maintain.
+Tech Debt
 
-[Click here to learn more](/cqrs-pattern)
+The Solution 
 
-## Build Rich, Auditable, and Contextual AI with Event Sourcing
+## A database that's designed to store events
 
-### Time Travel and Analyze your Business with a Full Audit Log
+KurrentDB is the database that speaks event sourcing natively. With 12+ years of continuous development and hundreds of production deployments, it delivers native capabilities that eliminate the complexity, performance compromises, and operational overhead of retrofitting traditional databases.
 
-Cart Events
+### Native Immutable Event Streams
 
-Added
+Every event is immutable and stored in append-only streams that preserve complete history. This isn't a feature bolted onâit's the fundamental architecture.
 
-80" TV
+Impact
 
-$1200
+Zero data loss. Reconstruct any past state, audit every change, replay any outcome.
 
-Added
+### Built-In Global Event Ordering
 
-Pro. HDMI
+Strict ordering within streams and global consistency across the entire event store. Every event receives a unique, monotonically increasing position.
 
-$80
+Impact
 
-Removed
+Eliminates complex application-level sequencing. Event order is guaranteed, not hoped for.
 
-80" TV
+### Multi-Stream Atomic Appends
 
-$1200
+Append events to multiple streams atomically in a single transaction, eliminating saga patterns and complex coordination logic.
 
-Removed
+Impact
 
-Pro. HDMI
+Run and manage KurrentDB yourself with full control and support.
 
-$80
+### Native Real-Time Subscriptions
 
-Added
+Built-in pub/sub powers real-time event flows with catch-up subscriptions (replay from any point) and persistent subscriptions (competing consumers)âno external brokers required.
 
-60" TV
+Impact
 
-$800
+Reactive architectures without adding message brokers or messaging infrastructure to your stack.
 
-Timeline
+### Advanced Projections Engine
 
-Cart  
-Total
+Process, transform, and link events in real-time directly within the database. Like stored procedures for event streamsâtriggered by new data, executed in-database.
 
-$1200
+Impact
 
-$2060
+Eliminates external stream processing frameworks. Event transformations run where the events live.
 
-$860
+### Optimistic Concurrency Built-In
 
-$780
+Native concurrency control prevents lost updates without pessimistic locking. Specify expected versions; the database rejects mismatched writes automatically.
 
-$1580
+Impact
 
-[{"type":"add","item":{"name":"80\" TV","price":1200},"cartSummary":{"items":1,"total":1200}},{"type":"add","item":{"name":"Pro. HDMI","price":80},"cartSummary":{"items":4,"total":2060}},{"type":"remove","item":{"name":"80\" TV","price":1200},"cartSummary":{"items":3,"total":860}},{"type":"remove","item":{"name":"Pro. HDMI","price":80},"cartSummary":{"items":2,"total":780}},{"type":"add","item":{"name":"60\" TV","price":800},"cartSummary":{"items":3,"total":1580}}]
+No events silently lost to concurrent modifications. High-throughput writes without locking overhead.
 
-[Learn How to Build Applications to Time Travel](https://docs.kurrent.io/dev-center/use-cases/time-travel/tutorial/tutorial-intro.html)
+### Sophisticated Event Indexing
 
-### Prompt for Insightful Questions only Possible with Historical Events
+Multi-tier indexing with dedicated entries per stream enables direct lookups. Custom indexes create virtual views by any event property without duplicating data.
 
-Which products are most frequently removed from carts?
+Impact
 
-How often are items swapped for cheaper alternatives?
+Sub-millisecond retrieval regardless of database size. New query patterns through configuration, not code.
 
-What accessories are removed when a primary product is removed?
+### Unlimited Event Retention
 
-At what cart value do users begin to remove items?
+Events stored indefinitely by defaultânever automatically deleted. Tiered archiving moves older events to cloud storage while maintaining transparent read-through access.
 
-Which items are most commonly added to the cart first?
+Impact
 
-What sequence of actions leads to cart abandonment?
+Complete audit trail without retention limits. Balance storage costs without sacrificing historical accessibility.
 
-How does adding a high-value item influence subsequent additions?
+### Enterprise-Ready & Production-Proven
 
-Which items are most often added back after being removed?
+Encryption at rest, RBAC, ISO 27001 and SOC2 Type II compliance. Official client libraries for .NET, Node.js, Python, Java, Go, and Rust.
 
-Do users remove items after viewing shipping costs?
+Impact
 
-What product combinations are most frequently tried but not purchased?
+12+ years of battle-tested stability across hundreds of production deployments. Mission-critical ready.
 
-Which products are most frequently removed from carts?
+How It Works 
 
-How often are items swapped for cheaper alternatives?
+## KurrentDB's event-native data model
 
-What accessories are removed when a primary product is removed?
+KurrentDB stores events in fine-grained streams with unique keys per streamâscalable to billions of streams without data duplication. Each event captures time as a key element, enabling global ordering across streams and intra-stream causation. Every append triggers a new stream version for optimistic concurrency, ensuring durable writes of atomic events with unique identification within and across streams.
 
-At what cart value do users begin to remove items?
+## KurrentDB in an event sourced application
 
-Which items are most commonly added to the cart first?
+In an event-sourced architecture, commands flow through deciders that determine state changes, which are persisted as events to KurrentDB. The event store serves as the single source of truth, with projections transforming events into read-optimized models for queries. Reactions listen to events and trigger updates to external systemsâall with immediate consistency for commands and eventual consistency for projections and reactions.
 
-What sequence of actions leads to cart abandonment?
+[More about KurrentDB](/kurrentdb)  [Read Docs](https://docs.kurrent.io/)
 
-How does adding a high-value item influence subsequent additions?
+The Kurrent Difference 
 
-Which items are most often added back after being removed?
+## Plug-and-play vs. infrastructure project
 
-Do users remove items after viewing shipping costs?
+General-purpose databases were designed around CRUDâthey assume you'll overwrite data as state changes. Event sourcing requires the opposite: append-only storage where history is never lost. Retrofitting CRUD databases means fighting their core design. KurrentDB was purpose-built for event sourcing, eliminating the complexity tax entirely.
 
-What product combinations are most frequently tried but not purchased?
+##### Other DBs
 
-## The world's leading event store for event-sourced applications
+## Kurrent
 
-### Decade of Event Sourcing Expertise
+Enforced manually
 
-Represents over a decade of refined event sourcing expertise and best practices from thousands of customers.
+Immutability
 
-### Immutable Append-Only Log
+Native
 
-Features a durable, sequential, and append-only log of immutable events.
+Custom schema
 
-[Learn more](https://docs.kurrent.io/getting-started/concepts.html#event-log)
+Native Eventâ¨Streams
 
-### Event Indexing
+Built-in
 
-Stores billions of events with indexes to retrieve specific events quickly.
+Custom implementation
 
-[Learn more](https://docs.kurrent.io/getting-started/concepts.html#stream-indexing)
+Global Eventâ¨Ordering
 
-### Native Pub/sub
+Guaranteed
 
-Supports Native pub/sub to synchronize other systems in real-time or on-demand.
+Custom logic
 
-### Programming Platforms
+Optimisticâ¨Concurrency
 
-Supports clients for major programming platforms such as .NET, Java, Node.js, Python, Go, and Rust.
+Native
 
-[Learn more](https://docs.kurrent.io/clients/)
+Limited or external tools
 
-### Kurrent Cloud
+Real-Timeâ¨Subscriprions
 
-Offers diverse deployment options, including Kurrent Cloud as a fully managed solution.
+Native
 
-[Learn more](/kurrent-cloud)
+External tools
 
-[ð Get Started with Event Sourcing](https://docs.kurrent.io/getting-started/introduction.html)
+Server-Sideâ¨Projections
 
-[ð Explore Event Sourcing Resources](/resources/eventsourcing)
+Built-in
+
+Varies, often limited
+
+Event Retention
+
+Unlimited + archiving
+
+Complex or unavailable
+
+Multi-Streamâ¨Atomicity
+
+Native
+
+Immutability
+
+Enforced manually
+
+Native
+
+Native Eventâ¨Streams
+
+Custom schema
+
+Built-in
+
+Global Eventâ¨Ordering
+
+Custom implementation
+
+Guaranteed
+
+Optimisticâ¨Concurrency
+
+Custom logic
+
+Native
+
+Real-Timeâ¨Subscriprions
+
+Limited or external tools
+
+Native
+
+Server-Sideâ¨Projections
+
+External tools
+
+Built-in
+
+Event Retention
+
+Varies, often limited
+
+Unlimited + archiving
+
+Multi-Streamâ¨Atomicity
+
+Complex or unavailable
+
+Native
+
+## Deploy Your Way
+
+Choose the deployment model that fits your needs
+
+Recommended
+
+#### Kurrent Cloud
+
+Focus on your application while we manage the infrastructure.
+
+  [Sign Up (No credit card required)](https://identity.eventstore.com/login?state=hKFo2SB2VDJFblBMRnlHbFdhOUVwc3ZTRXY0bkFVN0FBWmZicKFupWxvZ2luo3RpZNkgSk9EWU5VZF9kYmhEVm15RUZ4WUNyNE4wNGFPeEhpY2qjY2lk2SBCZW1SUHJmYVNvVGxsQld5VHExcHR2aWk1UTc4T3d4dw&client=BemRPrfaSoTllBWyTq1ptvii5Q78Owxw&protocol=oauth2&audience=https%3A%2F%2Fapi.kurrent.cloud&initial_tab=sign_up&redirect_uri=https%3A%2F%2Fconsole.kurrent.cloud%2Fcallback&response_type=code&scope=openid%20profile%20email%20offline_access%20cloud%3Aaccess%20cloud%3Aadmin%20cloud%3Aadmin-viewer)
+
+#### Kurrent Enterprise
+
+Run and manage KurrentDB yourself with full control and support.
+
+Start Free Trial (30-days free)
+
+## Free Trial
+
+  Request Trial License
+
+#### Kurrent Community
+
+Develop locally with core functionality.
+
+  [Download now](https://docs.kurrent.io/server/v26.0/quick-start/installation.html)
+
+## Tired of DIY event sourcing?
+
+Talk to an Expert
+
+## Talk to an Expert
+
+  Get in Touch

@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/oskardudycz/EventSourcing.NetCore
 - **Description**: Oskar Dudycz's .NET Event Sourcing examples & exercises
-- **Stars**: 3668
+- **Stars**: 3671
 - **Primary Language**: C#
 
 ---

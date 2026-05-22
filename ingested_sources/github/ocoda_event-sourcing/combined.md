@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/ocoda/event-sourcing
 - **Description**: Ocoda Event Sourcing — NestJS ES library (good docs, less actively maintained)
-- **Stars**: 257
+- **Stars**: 264
 - **Primary Language**: TypeScript
 
 ---

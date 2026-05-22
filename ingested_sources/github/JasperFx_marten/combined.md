@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/JasperFx/marten
 - **Description**: Marten — .NET document DB and event store on PostgreSQL
-- **Stars**: 3347
+- **Stars**: 3392
 - **Primary Language**: C#
 
 ---
@@ -123,7 +123,7 @@ See more in [Contribution Guidelines](CONTRIBUTING.md).
 
 | Description                         | Windows Commandline      | PowerShell               | Linux Shell             | DotNet CLI                                                |
 |-------------------------------------|--------------------------|--------------------------|-------------------------|-----------------------------------------------------------|
-| Run restore, build and test         | `build.cmd`              | `build.ps1`              | `build.sh`              | `dotnet build src\Marten.sln`                             |
+| Run restore, build and test         | `build.cmd`              | `build.ps1`              | `build.sh`              | `dotnet build src/Marten.slnx`                            |
 | Run all tests including mocha tests | `build.cmd test`         | `build.ps1 test`         | `build.sh test`         | `dotnet run --project build/build.csproj -- test`         |
 | Run just mocha tests                | `build.cmd mocha`        | `build.ps1 mocha`        | `build.sh mocha`        | `dotnet run --project build/build.csproj -- mocha`        |
 | Run StoryTeller tests               | `build.cmd storyteller`  | `build.ps1 storyteller`  | `build.sh storyteller`  | `dotnet run --project build/build.csproj -- storyteller`  |

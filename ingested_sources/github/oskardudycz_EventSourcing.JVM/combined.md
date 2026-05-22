@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/oskardudycz/EventSourcing.JVM
 - **Description**: Oskar Dudycz's JVM Event Sourcing examples
-- **Stars**: 321
+- **Stars**: 322
 - **Primary Language**: Java
 
 ---

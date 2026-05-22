@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/oskardudycz/EventSourcing.NodeJS
 - **Description**: Oskar Dudycz's Node.js Event Sourcing examples
-- **Stars**: 493
+- **Stars**: 497
 - **Primary Language**: TypeScript
 
 ---

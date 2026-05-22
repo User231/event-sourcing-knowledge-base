@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/EventStore/EventStore
 - **Description**: EventStoreDB — purpose-built database for event sourcing
-- **Stars**: 5757
+- **Stars**: 5798
 - **Primary Language**: C#
 
 ---

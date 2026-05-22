@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/prooph/event-store
 - **Description**: Prooph Event Store — PHP event sourcing components
-- **Stars**: 548
+- **Stars**: 547
 - **Primary Language**: PHP
 
 ---

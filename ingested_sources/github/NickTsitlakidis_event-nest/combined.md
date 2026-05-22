@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/NickTsitlakidis/event-nest
 - **Description**: EventNest — NestJS event sourcing library with PostgreSQL & MongoDB support
-- **Stars**: 27
+- **Stars**: 29
 - **Primary Language**: TypeScript
 
 ---

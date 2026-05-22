@@ -10,7 +10,7 @@ Ask Learn
 
 Ask Learn
 
-Focus mode
+Reading mode
 
 Table of contents
 [Read in English](#)
@@ -19,15 +19,6 @@ Add
 
 Add to plan
 [Edit](https://github.com/microsoftdocs/architecture-center/blob/main/docs/patterns/cqrs.md)
-
----
-
-#### Share via
-
-[Facebook](#)
-[x.com](#)
-[LinkedIn](#)
-[Email](#)
 
 ---
 

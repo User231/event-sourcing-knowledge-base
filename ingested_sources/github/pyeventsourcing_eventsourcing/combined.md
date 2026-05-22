@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/pyeventsourcing/eventsourcing
 - **Description**: Python eventsourcing library — mature ES toolkit for Python
-- **Stars**: 1644
+- **Stars**: 1665
 - **Primary Language**: Python
 
 ---

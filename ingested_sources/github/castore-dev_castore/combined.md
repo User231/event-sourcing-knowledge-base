@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/castore-dev/castore
 - **Description**: Castore — TypeScript library for Event Sourcing
-- **Stars**: 270
+- **Stars**: 274
 - **Primary Language**: TypeScript
 
 ---

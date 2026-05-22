@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/AxonFramework/AxonFramework
 - **Description**: Axon Framework — CQRS and Event Sourcing for Java/Spring
-- **Stars**: 3569
+- **Stars**: 3585
 - **Primary Language**: Java
 
 ---
@@ -32,6 +32,11 @@
 
 </p>
 
+> [!NOTE]
+> This repository has moved from the [Axon Framework GitHub organization](https://github.com/AxonFramework/) to the [AxonIQ GitHub organization](https://github.com/AxonIQ) to streamline project management.
+> All existing links, clones, forks, stars, and bookmarks will continue to work seamlessly thanks to GitHub's automatic redirects.
+> For more details, read [here](#repository-transferred)
+
 # Axon Framework
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.axonframework/axon-framework-bom)](https://central.sonatype.com/artifact/org.axonframework/axon-framework-bom)
@@ -39,8 +44,6 @@
 [![SonarCloud Status](https://sonarcloud.io/api/project_badges/measure?project=AxonFramework_AxonFramework&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=AxonFramework_AxonFramework)
 
 Axon Framework is a framework for building evolutionary, event-driven microservice systems based on the principles of Domain-Driven Design (DDD), Command-Query Responsibility Separation (CQRS), and Event Sourcing.
-
-<img src="https://library.axoniq.io/axoniq-console-getting-started/main/ac-monitor-axon-framework-applications/_images/ac-message-dependency-diagram.png" alt="Bootstrap logo">
 
 Axon Framework provides you with the necessary building blocks to follow these principles.
 Examples of building blocks are aggregate design handles, aggregate repositories, command buses, saga design handles, event stores, query buses, and more.
@@ -124,40 +127,80 @@ our [Privacy Policy](https://www.axoniq.io/privacy-policy) for any privacy conce
 
 <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=31ffe27e-667c-48ff-8a14-8029d44dfb66" />
 
+## Repository Transferred
+
+The Axon Framework team has decided to move the Axon Framework repository from the [Axon Framework GitHub organization](https://github.com/AxonFramework/) to the [Axoniq GitHub organization](https://github.com/AxonIQ).
+This switch makes project management easier for the team, due to our active use of GitHub Project boards.
+
+GitHub Project boards do not allow merging repositories between different organizations in a single board.
+The team is actively constructing several open-core licensed modules for Axon Framework.
+These are best placed under the AxonIQ GitHub organization due to their licensing.
+
+Users of the Axon Framework repository will not experience any disruptions from this transfer.
+GitHub automatically redirects all links, clones, and references from the old location to the new one.
+Your existing forks, stars, and bookmarks will continue to work seamlessly, regardless of the transfer.
+
+However, it is recommended to update existing local clones to the new repository URL.
+You can do this by using `git remote` on the command line:
+
+```shell
+git remote set-url origin https://github.com/AxonIQ/AxonFramework.git
+```
 
 
 ## File: docs/README.md
 
-# Documentation For Axon Framework.
+# Documentation For Axon Framework
 
-This folder contains the docs related to the Axon Framework project. The docs in this folder are written as part of the [AxonIQ Documentation](https://docs.axoniq.io), and are [written in AsciiDoc and built with Antora.](https://docs.axoniq.io/contribution_guide/overview/platform.html)
+This folder contains the docs related to the Axon Framework project. The docs in this folder are written as part of
+the [AxonIQ Docs](https://docs.axoniq.io), and are written in AsciiDoc and built with Antora.
 
-The following are the current documentation sources (folders):
+This repository holds the sources for the
+following [Antora Components](https://docs.antora.org/antora/latest/component-name-and-version/) in the corresponding
+folders:
 
-- `af-fundamentals-tutorial`: [A tutorial covering Axon Framework's fundamental components and features.](https://docs.axoniq.io/axon_framework_fundamentals/index.html)
-- `identifier-generation-guide` : [Guide that covers several considerations in regards to identifier generation in Axon Framework-based applications.](https://docs.axoniq.io/identifier-generation-guide/index.html)
-- `message-handler-tunning-guide` : [Guide that covers the message handler tuning in your Axon Framework applications.](https://docs.axoniq.io/message-handler-tuning-guide/index.html)
-- `meta-annotations-guide` : [Guide that covers several considerations in regards to creating Meta Annotations for Axon Framework-based applications.](https://docs.axoniq.io/meta-annotations-guide/index.html)
-- `old-reference-guide` : [The Axon Framework former reference guide migrated from former docs.axoniq.io](https://docs.axoniq.io/axon-framework-reference/introduction.html)
-- `rdbms-tunning-guide` : [Guide that covers several considerations in regards to tuning the database for events.](https://docs.axoniq.io/rdbms-tuning-guide/index.html)
+- [
+  `./getting-started/`](getting-started): [A tutorial covering Axon Framework 5's fundamental components and features (dcb-focused).](https://docs.axoniq.io/axon-framework-5-getting-started/)
+- [
+  `./identifier-generation-guide/`](identifier-generation-guide) : [Guide that covers several considerations with regard to identifier generation in Axon Framework-based applications.](https://docs.axoniq.io/identifier-generation-guide/latest)
+- [
+  `./message-handler-tunning-guide/`](message-handler-customization-guide) : [Guide that covers the message handler tuning in your Axon Framework applications.](https://docs.axoniq.io/message-handler-customization-guide/latest)
+- [
+  `./meta-annotations-guide/`](meta-annotations-guide) : [Guide that covers several considerations with regard to creating Meta Annotations for Axon Framework-based applications.](https://docs.axoniq.io/meta-annotations-guide/latest)
+- [
+  `./reference-guide/`](reference-guide) : [The Axon Framework former reference guide migrated from former docs.axoniq.io](https://docs.axoniq.io/axon-framework-reference/latest)
 
 
-## Contributing to the docs.
+## Contributing to the docs
 
-You are welcome to contribute to these docs. Whether you want to fix a typo, or you find something missing, something that it's not clear or can be improved, or even if you want to write an entire piece of docs to illustrate something that could help others to understand the use of the Bike Rental App, you are more than welcome to send a Pull Request to this github repository. Just make sure you follow the guidelines explained in [AxonIQ Library Contribution Guide](https://docs.axoniq.io/contribution_guide/index.html)
+You are welcome to contribute to these docs. Whether you want to fix a typo, or you find something missing, something
+that it's not clear or can be improved, or even if you want to write an entire piece of docs to illustrate something
+that could help others to understand the use of Axon Framework, you are more than welcome to send a Pull Request to this
+github repository.
 
-## Building and testing this docs locally.
+## Building and previewing these docs locally
 
-If you want to build and explore the docs locally (because you have made changes or before contributing), you can use the Antora's build file in `docs/_playbook` folder.
+If you want to build and explore the docs locally (because you have made changes or before contributing), you can use
+the Antora build file in the [`./_playbook`](_playbook) folder following these steps:
 
-You can check the [detailed information on how the process to build the docs works](https://docs.axoniq.io/contribution_guide/overview/build.html), but in short, all you have to do is: 
+### Install dependencies
 
-1. Make sure you have Node (a LTS version is preferred), Antora and Vale installed in your system.
-2. CD to the `docs/_playbook` folder.
-3. Run `npm install.`
-4. Run `npx antora playbook.yaml`. Antora will generate the set of static html files under `docs/_playbook/build/site`
-5. Move to `docs/_playbook/build/site` and execute some local http server to serve files in that directory. For example by executing `python3 -m http.server 8070`
-6. Open your browser and go to `http://localhost:8070`. You should be able to navigate the local version of the docs.
+1. Make sure you have [Node](https://nodejs.org/en/download) (a LTS version is preferred)
+   and [Vale](https://vale.sh/docs/install) installed in your system.
+2. CD to the [`./_playbook`](_playbook) folder.
+3. Run `npm install.` to install Antora
+
+### Build and preview
+
+1. Run `node watch.js`. Antora will generate the set of static html files under [
+   `./_playbook/build/site`](_playbook/build/site), which will be served using [Express.js}(https://expressjs.com/) via http://localhost:3000
+2. Each of the existing Antora Components will be available under a different folder in the webserver's root (named
+   after the component name in the corresponding `antora.yml`).
+3. Antora determines the component
+   version [based on the git refname](https://docs.antora.org/antora/latest/component-version-key/#refname) according to
+   the configuration in the `antory.yml`. The rendered pages are available inside a subdirectory of the component's
+   version directory, named after the component's version (depending on the git branch you have checked out).
+4. rebuilds will trigger automatically when changing documentation files
 
 
 

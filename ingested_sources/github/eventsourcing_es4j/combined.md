@@ -2,7 +2,7 @@
 
 - **URL**: https://github.com/eventsourcing/es4j
 - **Description**: ES4J — Event capture and querying for Java
-- **Stars**: 410
+- **Stars**: 411
 - **Primary Language**: Java
 
 ---

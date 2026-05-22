@@ -54,13 +54,19 @@ All external sources are listed in [sources.yaml](sources.yaml). After editing i
 | GitHub READMEs (any repo) | `github_repos:` | `scripts/fetch_github.py` | `ingested_sources/github/` |
 | Full clones (where `clone: true`) | `github_repos:` | `scripts/clone_repos.py` | `repos_cloned/<owner>_<repo>/` |
 
-Each script is idempotent — re-running just refreshes caches/clones. Useful flags:
+By default each script skips items that already exist on disk (cached web pages, cached READMEs, already-cloned repos). Pass `--force` to re-fetch / re-clone:
 
 ```bash
-# Re-clone everything from scratch
+# Re-fetch articles even if cached Markdown exists
+uv run scripts/fetch_web.py --force
+
+# Re-fetch GitHub READMEs even if cached
+uv run scripts/fetch_github.py --force
+
+# Re-clone every repo from scratch
 uv run scripts/clone_repos.py --force
 
-# Pull latest commits in already-cloned repos
+# Or pull latest commits in already-cloned repos (no re-clone)
 uv run scripts/clone_repos.py --pull
 ```
 

@@ -59,7 +59,7 @@ These often aren't ES'd at all. Raw signal goes to time-series stores (InfluxDB,
 
 **What hurts**: 1–100 Hz × millions of devices. Even snapshots can't save you.
 
-**Toolkit shift**: hot-path goes to TSDB; ES holds derived business events only. Same pattern as ride-sharing GPS pings (see [ride-sharing-and-mobility.md](ride-sharing-and-mobility.md)).
+**Toolkit shift**: hot-path goes to TSDB; ES holds derived business events only. Same pattern as ride-sharing GPS pings (see [specific/ride-sharing-and-mobility.md](specific/ride-sharing-and-mobility.md)).
 
 ## D. Lifetime records that never naturally close
 
@@ -78,7 +78,7 @@ The *individual* aggregate is unbounded: 1 patient × 80 years × many encounter
 
 **What hurts**: closing-the-books only partially helps — you still need queryable history, often legally.
 
-**Toolkit shift**: period-sharded streams (`patient-{id}-{year}`) carrying summary events forward; cold archival to S3 Glacier / Azure Archive with index-only hot tier; PII handling strategies (crypto-shredding, tokenization) compatible with "forever" retention — see the GDPR section in [ecommerce-and-retail.md](ecommerce-and-retail.md).
+**Toolkit shift**: period-sharded streams (`patient-{id}-{year}`) carrying summary events forward; cold archival to S3 Glacier / Azure Archive with index-only hot tier; PII handling strategies (crypto-shredding, tokenization) compatible with "forever" retention — see the GDPR section in [specific/ecommerce-and-retail.md](specific/ecommerce-and-retail.md).
 
 ## E. Branching / non-linear histories
 
@@ -100,7 +100,7 @@ These break the linear-stream model entirely. There isn't one true history.
 ES might apply at the *business event* layer above, but the raw operational stream is too hot for a per-aggregate stream model.
 
 - **Trading / market data**: tick streams, order books (LMAX, KX/KDB)
-- **Payments at scale**: card-network switch volumes (TigerBeetle was built for exactly this — see [banking-and-finance.md](banking-and-finance.md))
+- **Payments at scale**: card-network switch volumes (TigerBeetle was built for exactly this — see [specific/banking-and-finance.md](specific/banking-and-finance.md))
 - **Ad-tech**: bid streams, impression/click logs
 - **CDN / web analytics**: every request from every edge node
 
@@ -126,11 +126,11 @@ The recurring shape: **the aggregate stays an aggregate, but its events get redi
 
 | Domain doc | Archetype touched | Where it's addressed |
 |---|---|---|
-| [banking-and-finance.md](banking-and-finance.md) | D (lifetime), F (throughput) | Period-sharded streams, separate journal stream, TigerBeetle for hot accounts |
-| [ride-sharing-and-mobility.md](ride-sharing-and-mobility.md) | C (telemetry) | GPS pings explicitly kept *off* the event store |
-| [food-ordering-and-delivery.md](food-ordering-and-delivery.md) | C (courier location) | Same pattern — separate location topic with short retention |
-| [ecommerce-and-retail.md](ecommerce-and-retail.md) | D (inventory streams that never close) | Period rollup (`inventory-{sku}-{warehouseId}-2026Q2`); GDPR vs immutability |
-| [hotel-and-hospitality.md](hotel-and-hospitality.md) | — | Hotel domain has natural closes (checkout, year-end), so it doesn't hit this directly |
+| [specific/banking-and-finance.md](specific/banking-and-finance.md) | D (lifetime), F (throughput) | Period-sharded streams, separate journal stream, TigerBeetle for hot accounts |
+| [specific/ride-sharing-and-mobility.md](specific/ride-sharing-and-mobility.md) | C (telemetry) | GPS pings explicitly kept *off* the event store |
+| [specific/food-ordering-and-delivery.md](specific/food-ordering-and-delivery.md) | C (courier location) | Same pattern — separate location topic with short retention |
+| [specific/ecommerce-and-retail.md](specific/ecommerce-and-retail.md) | D (inventory streams that never close) | Period rollup (`inventory-{sku}-{warehouseId}-2026Q2`); GDPR vs immutability |
+| [specific/hotel-and-hospitality.md](specific/hotel-and-hospitality.md) | — | Hotel domain has natural closes (checkout, year-end), so it doesn't hit this directly |
 
 ## Domains worth their own future doc
 

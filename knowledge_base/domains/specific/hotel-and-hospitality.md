@@ -118,7 +118,7 @@ Flow (saga variant, from the actual code):
 
 The pattern Oskar emphasises: **business logic stays in the `GroupCheckout` aggregate; the saga is dumb — pure routing**. Compare to the `GroupCheckoutProcessManager` variant which collapses both into one class and is explicitly tagged "event-driven but not event-sourced".
 
-See also [../implementation-patterns/multi-aggregate-commands-and-sagas.md](../implementation-patterns/multi-aggregate-commands-and-sagas.md) for the underlying pattern.
+See also [../../implementation-patterns/multi-aggregate-commands-and-sagas.md](../../implementation-patterns/multi-aggregate-commands-and-sagas.md) for the underlying pattern.
 
 ### 4c. Other industry sagas
 - **Overbooking handling.** Reactive projection (`DailyOverbookingDetector`) raises `DailyOverbookingDetected`. A revenue/operations saga then either upsells, contacts guests for voluntary re-accommodation, or triggers `WalkGuestToPartnerHotel`. Production hotels intentionally overbook based on no-show predictions ([Mews — Hotel overbooking strategy](https://www.mews.com/en/blog/hotel-overbooking-strategy)).

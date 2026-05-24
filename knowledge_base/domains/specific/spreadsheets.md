@@ -1,6 +1,6 @@
 # Spreadsheets — Aggregate & Stream Decomposition
 
-What's distinctive about spreadsheets is that the "domain model" is *also* a programming environment: every cell can be a formula referencing other cells, and changing one cell ripples through a dependency graph that the system itself must maintain. Layer real-time multi-user editing on top and the textbook ES patterns (one stream per aggregate, optimistic concurrency, deterministic replay) collide with three forces simultaneously: an [unbounded edit history](unbounded-and-infinite-streams.md), [concurrent operations](unbounded-and-infinite-streams.md#a-collaborative-documents--every-keystrokeoperation-is-an-event) that must commute or be transformed, and a recomputation engine whose outputs must be reproducible from the same inputs.
+What's distinctive about spreadsheets is that the "domain model" is *also* a programming environment: every cell can be a formula referencing other cells, and changing one cell ripples through a dependency graph that the system itself must maintain. Layer real-time multi-user editing on top and the textbook ES patterns (one stream per aggregate, optimistic concurrency, deterministic replay) collide with three forces simultaneously: an [unbounded edit history](../unbounded-and-infinite-streams.md), [concurrent operations](../unbounded-and-infinite-streams.md#a-collaborative-documents--every-keystrokeoperation-is-an-event) that must commute or be transformed, and a recomputation engine whose outputs must be reproducible from the same inputs.
 
 This doc surveys what Google Sheets, Excel Online, Airtable, Smartsheet, Notion, Quip, EtherCalc, Coda, Rows, Causal, OnlyOffice, Collabora, and the relevant libraries (HyperFormula, SpreadJS, ShareDB) actually do. Names where known; tradeoffs explicit.
 
@@ -271,7 +271,7 @@ This is where spreadsheets diverge from collaborative text editors in interestin
 - **OT** (operational transform) — concurrent ops are transformed against each other so all clients converge regardless of arrival order. Used by Google Sheets / Docs / Excel Online.
 - **CRDT** (conflict-free replicated data type) — data structures whose merge is mathematically guaranteed to converge without transforms or a central server.
 
-For the full treatment of when each is the right choice and why, see [concepts/collaborative-editing-ot-crdt-lww.md](../concepts/collaborative-editing-ot-crdt-lww.md). The rest of this section assumes you know the basic distinction and focuses on what's specific to spreadsheets.
+For the full treatment of when each is the right choice and why, see [concepts/collaborative-editing-ot-crdt-lww.md](../../concepts/collaborative-editing-ot-crdt-lww.md). The rest of this section assumes you know the basic distinction and focuses on what's specific to spreadsheets.
 
 ### Why CRDTs are hard for grid spreadsheets specifically
 
@@ -520,5 +520,5 @@ These run as side-effects of user-triggered events but emit further user-equival
 - [Quip architecture tour (SD Times)](https://sdtimes.com/android/googles-bret-taylor-gives-tour-quips-architecture/) — atomic-unit document model.
 - Oskar Dudycz — [Closing the Books](https://event-driven.io/en/closing_the_books_in_practice/). Period-bucketing applies to long-lived workbooks too: snapshot at fiscal-quarter end, truncate prior op-stream.
 - [Verraes — Practical Event Sourcing](https://verraes.net/2014/03/practical-event-sourcing/). Background on event-vs-side-effect distinctions referenced throughout.
-- See also the [collaborative documents section of unbounded-and-infinite-streams.md](unbounded-and-infinite-streams.md#a-collaborative-documents--every-keystrokeoperation-is-an-event) for the broader class of "every keystroke is an event" problems this domain belongs to.
+- See also the [collaborative documents section of unbounded-and-infinite-streams.md](../unbounded-and-infinite-streams.md#a-collaborative-documents--every-keystrokeoperation-is-an-event) for the broader class of "every keystroke is an event" problems this domain belongs to.
 

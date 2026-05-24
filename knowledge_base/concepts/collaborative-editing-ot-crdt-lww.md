@@ -86,7 +86,7 @@ Two big families:
 
 **Where it shines**: peer-to-peer / local-first apps. No central server needed. Offline edits merge cleanly when devices reconnect — this is why Automerge powers a lot of the local-first movement.
 
-**Tradeoffs for grid-shaped documents (e.g., spreadsheets)**: bad fit. CRDTs assume the position-of-a-thing is part of the thing's identity. But in spreadsheets, **formulas reference positions** — `=A1+B1` cares that A1 is at column 1 row 1. Insert a row above A1 and the formula must shift. That's structural rewriting of references, which doesn't fit CRDT merge semantics. See [spreadsheets.md §5](../domains/spreadsheets.md) for the full discussion.
+**Tradeoffs for grid-shaped documents (e.g., spreadsheets)**: bad fit. CRDTs assume the position-of-a-thing is part of the thing's identity. But in spreadsheets, **formulas reference positions** — `=A1+B1` cares that A1 is at column 1 row 1. Insert a row above A1 and the formula must shift. That's structural rewriting of references, which doesn't fit CRDT merge semantics. See [spreadsheets.md §5](../domains/specific/spreadsheets.md) for the full discussion.
 
 ## When each is the right choice
 
@@ -116,7 +116,7 @@ The choice matters most where the **event itself** needs to encode merge intent.
 
 ## Where these show up in this knowledge base
 
-- [domains/spreadsheets.md](../domains/spreadsheets.md) — §5 covers OT/CRDT/LWW choice for the grid-as-document, row-as-record, and dimensional stances. The most thorough domain treatment.
+- [domains/spreadsheets.md](../domains/specific/spreadsheets.md) — §5 covers OT/CRDT/LWW choice for the grid-as-document, row-as-record, and dimensional stances. The most thorough domain treatment.
 - [domains/unbounded-and-infinite-streams.md §A](../domains/unbounded-and-infinite-streams.md#a-collaborative-documents--every-keystrokeoperation-is-an-event) — collaborative documents as an archetype where classical ES doesn't fit and CRDTs/OT take over.
 
 ## Foundational references

@@ -265,7 +265,13 @@ HyperFormula serializes the AST with stable node IDs; Excel serializes source te
 
 ## 5. Collaborative editing — OT, CRDT, and the pragmatic middle
 
-This is where spreadsheets diverge from collaborative text editors in interesting ways.
+This is where spreadsheets diverge from collaborative text editors in interesting ways. Three strategies dominate concurrent-edit handling, and the relevant tradeoffs matter for the rest of this section:
+
+- **LWW** (last-write-wins) — concurrent writes to the same property: the later one replaces the earlier. Per-property granularity is essential; whole-document LWW is useless.
+- **OT** (operational transform) — concurrent ops are transformed against each other so all clients converge regardless of arrival order. Used by Google Sheets / Docs / Excel Online.
+- **CRDT** (conflict-free replicated data type) — data structures whose merge is mathematically guaranteed to converge without transforms or a central server.
+
+For the full treatment of when each is the right choice and why, see [concepts/collaborative-editing-ot-crdt-lww.md](../concepts/collaborative-editing-ot-crdt-lww.md). The rest of this section assumes you know the basic distinction and focuses on what's specific to spreadsheets.
 
 ### Why CRDTs are hard for grid spreadsheets specifically
 

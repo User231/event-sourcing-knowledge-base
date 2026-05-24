@@ -12,7 +12,7 @@ Classical ES (one stream per aggregate, replay-from-zero, optimistic-locked appe
 4. **The "aggregate" has no closing event** — patient records, chat channels, social feeds.
 5. **Retention is legally required to be forever** — healthcare, audit, land titles.
 
-Below is a taxonomy of domains by *which* of these problems they hit. The point isn't that ES is wrong for these — it's that you need different tools (CRDTs, OT, log compaction, time-series stores, snapshot+truncate) than the per-aggregate stream model.
+Below is a taxonomy of domains by *which* of these problems they hit. The point isn't that ES is wrong for these — it's that you need different tools ([CRDTs, OT, LWW](../concepts/collaborative-editing-ot-crdt-lww.md), log compaction, time-series stores, snapshot+truncate) than the per-aggregate stream model.
 
 ## A. Collaborative documents — every keystroke/operation is an event
 

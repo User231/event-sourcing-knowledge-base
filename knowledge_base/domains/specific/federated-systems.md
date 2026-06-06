@@ -2,7 +2,7 @@
 
 A federated system is **multi-master event sourcing where each master is an independently operated server with its own admin, retention policy, identity authority, and moderation rules**. Unlike a Cassandra ring or CockroachDB cluster (see [multi-master-distributed-dbs.md](multi-master-distributed-dbs.md)), peers can defederate, run out of disk, censor a topic, ignore a delete, or go offline for a week and come back demanding replay.
 
-This is archetype-E from [unbounded-and-infinite-streams.md §E](../unbounded-and-infinite-streams.md#e-branching--non-linear-histories) made concrete: events branch and merge across administrative domains, identity is server-scoped, and the source of truth is whoever signed the event.
+This is archetype-E from [unbounded-and-infinite-streams.md §E](../cross-cutting/unbounded-and-infinite-streams.md#e-branching--non-linear-histories) made concrete: events branch and merge across administrative domains, identity is server-scoped, and the source of truth is whoever signed the event.
 
 The cleanest example is **Matrix**, whose room is a signed DAG of events replicated across homeservers and reconciled by a deterministic state-resolution algorithm. The oldest is **SMTP email**, federating signed-ish threaded messages across mutually distrustful servers since 1982. **ActivityPub**, **AT Protocol**, **Nostr**, **XMPP**, and historical **Usenet/NNTP** sit between those poles.
 
@@ -172,7 +172,7 @@ Flag     { actor, object, content }                # moderation report
 | **Email** | None | Recall is vendor-local |
 | **Usenet** | `cancel` control message | Largely ignored — cancels were forgeable, so most servers stopped honouring them |
 
-Once an event is forwarded to N servers, the best you can do is request each drop it. You cannot enforce it. This is the operational shape of GDPR vs an immutable signed event store across jurisdictions you don't control. Several Mastodon admins document month-long "tombstone storms" after a popular account deletes — the `Delete` fans out to thousands of servers, each chewing through stored posts.
+Once an event is forwarded to N servers, the best you can do is request each drop it. You cannot enforce it. This is the operational shape of GDPR vs an immutable signed event store across jurisdictions you don't control. Several Mastodon admins document month-long "tombstone storms" after a popular account deletes — the `Delete` fans out to thousands of servers, each chewing through stored posts. The cross-domain treatment of the privacy-vs-immutability tension is in [`../cross-cutting/compliance-pii-and-immutability.md`](../cross-cutting/compliance-pii-and-immutability.md) — federated advisory delete is the hardest version.
 
 **Model `Delete` as a separate aggregate referencing the original**, not as a mutation. The original `Create` stays for audit; projections decide whether to surface.
 
@@ -345,7 +345,7 @@ The mental model: **a federation protocol is an ES system whose log is sharded b
 
 ## Cross-references
 
-- [`../unbounded-and-infinite-streams.md#e-branching--non-linear-histories`](../unbounded-and-infinite-streams.md#e-branching--non-linear-histories) — federation is archetype-E
+- [`../cross-cutting/unbounded-and-infinite-streams.md#e-branching--non-linear-histories`](../cross-cutting/unbounded-and-infinite-streams.md#e-branching--non-linear-histories) — federation is archetype-E
 - [`../../concepts/collaborative-editing-ot-crdt-lww.md`](../../concepts/collaborative-editing-ot-crdt-lww.md) — Matrix state-res is the room-state analogue of CRDT merge; LWW on `origin_server_ts` is the Mastodon edit story
 - [chat-and-messaging.md](chat-and-messaging.md) — Matrix is the federated case of chat-channel patterns
 - [social-feeds.md](social-feeds.md) — ActivityPub fan-out is social feeds + federation

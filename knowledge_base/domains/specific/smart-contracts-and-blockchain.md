@@ -2,7 +2,7 @@
 
 A blockchain is the most extreme event store ever built: a single global, distributed, append-only, cryptographically-linked log replicated across thousands of mutually-distrusting nodes, with consensus-driven write admission and no central operator. Every pattern classical ES practitioners know — optimistic concurrency, replay, snapshots, projections, subscriber failure, compensation — has a counterpart, stretched into adversarial multi-master territory. This is a field guide for ES engineers reading blockchain literature: what each concept maps to, where the lessons transfer, and where blockchain is a category error rather than an upgrade.
 
-The archetype-E framing (branching / non-linear histories) is in [../unbounded-and-infinite-streams.md](../unbounded-and-infinite-streams.md). This doc is the concrete walkthrough.
+The archetype-E framing (branching / non-linear histories) is in [../cross-cutting/unbounded-and-infinite-streams.md](../cross-cutting/unbounded-and-infinite-streams.md). This doc is the concrete walkthrough.
 
 ## 1. The basic mapping
 
@@ -203,14 +203,14 @@ For ES practitioners: **if your event handler is non-deterministic, your project
 | Selective replay (one tenant only) | Routine | Impossible — all replicas replay everything |
 | Per-customer retention policies | Standard | None — the chain is forever |
 
-The privacy-vs-immutability conflict is the sharpest version of a tension classical ES already has. On-chain answers: **crypto-shredding** (store ciphertext on-chain, hold the key off-chain, destroy the key to "forget" — recognised by EU data-protection authorities as effective erasure); **zkSNARKs / zkSTARKs** (prove a fact without revealing the underlying data); **shielded pools** (Tornado Cash, Zcash, Aztec — privacy by breaking the link between addresses, at the cost of complicating audit).
+The privacy-vs-immutability conflict is the sharpest version of a tension classical ES already has — see [`../cross-cutting/compliance-pii-and-immutability.md`](../cross-cutting/compliance-pii-and-immutability.md) for the cross-domain four-strategy taxonomy (crypto-shred / tombstone / tokenise / rewrite) and the regulatory regimes that drive each. On-chain answers: **crypto-shredding** (store ciphertext on-chain, hold the key off-chain, destroy the key to "forget" — recognised by EU data-protection authorities as effective erasure); **zkSNARKs / zkSTARKs** (prove a fact without revealing the underlying data); **shielded pools** (Tornado Cash, Zcash, Aztec — privacy by breaking the link between addresses, at the cost of complicating audit).
 
 ## 13. Where blockchain is genuinely useful as ES inspiration
 
 - **Ledger systems with adversarial multi-master**: cross-organisation settlement (RippleNet, [Hyperledger Fabric channels](https://hyperledger-fabric.readthedocs.io/en/latest/fabric_model.html)) where no single party can be trusted to own the event store. Fabric is the closest enterprise analog: a permissioned blockchain where ordering nodes provide consensus and peer nodes maintain per-channel ledgers — "shared event store across N organisations" with classical KYC.
 - **Audit logs needing third-party verifiability**: anchor your event-log Merkle root to a public chain (Bitcoin via OpenTimestamps, Ethereum via one hash tx per hour). Cheap external non-repudiation without exposing underlying events.
 - **Supply-chain provenance**: when the audit trail must survive any one party going bust or hostile — IBM Food Trust, TradeLens, MediLedger. Trust assumption: no one party controls history.
-- **Land titles / civic registries**: long-running immutable records where data lifetime exceeds operator lifetime (archetype D in [../unbounded-and-infinite-streams.md](../unbounded-and-infinite-streams.md)).
+- **Land titles / civic registries**: long-running immutable records where data lifetime exceeds operator lifetime (archetype D in [../cross-cutting/unbounded-and-infinite-streams.md](../cross-cutting/unbounded-and-infinite-streams.md)).
 
 The test: **is the trust model "no single operator"?** If yes, blockchain's overhead justifies itself. If no, you're paying for a property you don't need.
 
@@ -243,7 +243,7 @@ Most "blockchain for X" pitches fail this checklist. A boring Postgres event sto
 ## 16. Cross-references & sources
 
 Cross-refs:
-- [../unbounded-and-infinite-streams.md](../unbounded-and-infinite-streams.md) — archetype-E slot blockchain fills.
+- [../cross-cutting/unbounded-and-infinite-streams.md](../cross-cutting/unbounded-and-infinite-streams.md) — archetype-E slot blockchain fills.
 - [banking-and-finance.md](banking-and-finance.md) — TigerBeetle, ledger-as-event-log; same hot-account problem that motivates rollups.
 - [../../implementation-patterns/optimistic-concurrency.md](../../implementation-patterns/optimistic-concurrency.md) — `expectedVersion` is per-account nonce here, block-hash there.
 - [../../implementation-patterns/subscriber-failure-strategies.md](../../implementation-patterns/subscriber-failure-strategies.md) — reorgs are the adversarial form.

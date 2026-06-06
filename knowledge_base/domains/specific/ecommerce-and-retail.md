@@ -10,14 +10,14 @@ Boundaries in e-commerce are driven by **lifecycle**, **contention**, and **who 
 |---|---|---|
 | **ShoppingCart** | Per-user, anonymous-tolerant, abandoned by default. Should NOT enforce stock invariants — only "intent". Short-lived; closed on Checkout/Abandon. | Hours to days |
 | **Order** | Authoritative commercial document. Owns OrderLines as **internal entities**, not separate aggregates — invariants like `sum(line.subtotal) == header.total` and "order status must reflect line states" make a single transactional boundary mandatory. | Days to months (until refunds expire) |
-| **OrderLine** | Almost always an entity inside Order. Promoted to its own aggregate ONLY in B2B/marketplace scenarios where each line ships from a different seller/warehouse and has independent fulfillment status (e.g., Mercado Libre marketplace, Amazon multi-seller orders). | Same as Order |
+| **OrderLine** | Almost always an entity inside Order. Promoted to its own aggregate ONLY in B2B/marketplace scenarios where each line ships from a different seller/warehouse and has independent fulfillment status (e.g., Mercado Libre marketplace, Amazon multi-seller orders). For the marketplace-shape (vs. single-merchant) treatment — Demand/Supply/Match anchors, two-sided reputation, multi-party settlement — see [`../cross-cutting/marketplaces-and-matching-engines.md`](../cross-cutting/marketplaces-and-matching-engines.md). | Same as Order |
 | **Customer** | Slow-changing master data. Often event-sourced for GDPR audit + preference history. | Years |
 | **Product / SKU** | Catalog; usually NOT event-sourced — read-heavy, CRUD is fine. Pricing/promotions are split out. | Years |
 | **Inventory / StockItem** | **One aggregate per (SKU, location)** is the canonical pattern. Per-SKU global aggregates collapse under flash-sale contention. Walmart and Salesforce both partition by `product × node` / `SKU × location`. | Indefinite |
-| **Reservation** | Short-lived aggregate with TTL. Holds stock between cart-checkout and payment-capture. Salesforce models it as "Reservation Sets". | Minutes |
+| **Reservation** | Short-lived aggregate with TTL. Holds stock between cart-checkout and payment-capture. Salesforce models it as "Reservation Sets". The same `Reserved→Confirmed|Released` skeleton powers hotel rooms, airline seats, event tickets, and banking auth holds — see [`../cross-cutting/reservations-and-finite-resources.md`](../cross-cutting/reservations-and-finite-resources.md). | Minutes |
 | **Pricing / PriceList** | Separate aggregate so that price changes don't invalidate historical orders. Orders capture the price as a fact at placement time. | Years |
 | **Promotion / Coupon** | Own aggregate; tracks redemption count as invariant. Hot promo codes get the same contention problem as hot SKUs. | Campaign lifetime |
-| **Payment** | Separate aggregate. PCI scope isolation + external gateway reconciliation = hard service boundary. Lifecycle: authorize → capture → settle / refund. | Days to months |
+| **Payment** | Separate aggregate. PCI scope isolation + external gateway reconciliation = hard service boundary. Lifecycle: authorize → capture → settle / refund. Refunds, store credit, loyalty points, and gift cards all behave as ledger entries — see [`../cross-cutting/ledgers-and-double-entry.md`](../cross-cutting/ledgers-and-double-entry.md). | Days to months |
 | **Shipment** | Own aggregate. An order can have N shipments (split shipment). Lifecycle is operational, not commercial. | Days to weeks |
 | **Pick / Pack** | Warehouse-internal aggregates; usually a `PickTask` per picker that may span lines from multiple shipments. Operationally separate from Shipment. | Hours |
 | **Return / RMA** | Own aggregate. Triggered months after Order is "closed", so it must be reopen-safe — separate stream prevents Order from being eternally open. | Days to weeks |
@@ -107,6 +107,8 @@ Salesforce uses a monotonically increasing **Event Sequence Number** per SKU-Loc
 - `RefundIssued`, `LoyaltyPointsAdjusted`
 
 ## 4. Canonical sagas / process managers
+
+For the cross-domain inventory of saga families (fan-out, linear state-machine, time-driven retry, external-system integration, multi-party coordination, compensation cascade) and the recurring failure modes, see [`../cross-cutting/sagas-and-multi-step-workflows.md`](../cross-cutting/sagas-and-multi-step-workflows.md). This section catalogues the e-commerce-specific instantiations.
 
 ### 4.1 Order placement saga (choreography or orchestration)
 
@@ -199,7 +201,7 @@ A common hybrid: cart is state-stored during shopping; at `CartConfirmed` time t
 2. **Partial fulfilment** — `OrderShipped` is NOT terminal; `OrderFullyShipped` is. Downstream subscribers (warehousing dashboards, customer emails) must be partial-aware.
 3. **Fraud holds** — `OrderFraudHeld` is not a saga compensation; it's a pause. Inventory remains reserved. Many teams forget this and release stock too early.
 4. **Returns months later** — never put Order into a "closed" state until the legal return window + chargeback window have expired (60–180 days). Return is a separate aggregate referencing Order by id.
-5. **GDPR vs immutability** — strategies ([Dudycz on GDPR](https://event-driven.io/en/gdpr_in_event_driven_architecture/), [Conduktor](https://www.conduktor.io/blog/gdpr-kafka-right-to-erasure)):
+5. **GDPR vs immutability** — strategies ([Dudycz on GDPR](https://event-driven.io/en/gdpr_in_event_driven_architecture/), [Conduktor](https://www.conduktor.io/blog/gdpr-kafka-right-to-erasure)). For the cross-domain treatment (HIPAA, PCI, SOX, KYC/AML, Schrems II, federated advisory delete) and the four-strategy taxonomy (crypto-shred / tombstone / tokenise / rewrite), see [`../cross-cutting/compliance-pii-and-immutability.md`](../cross-cutting/compliance-pii-and-immutability.md):
    - **Crypto-shredding**: PII fields encrypted with per-customer key; key deletion makes events unreadable. Caveat: regulators may still consider encrypted PII to be PII.
    - **PII tokenization / external vault**: events store tokens; a separate Vault (e.g., HashiCorp Vault) resolves them; revoking returns null.
    - **Stream rewrite**: copy the stream minus the PII; only acceptable when you control all subscribers.

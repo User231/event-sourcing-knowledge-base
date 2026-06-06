@@ -2,7 +2,7 @@
 
 Aggregate boundaries, stream-id schemes, events, sagas, and gotchas from platforms that actually run subscription billing at scale: Stripe Billing, Chargebee, Recurly, Zuora, Paddle, plus operators that built it in-house (Netflix, Spotify, Disney+, telco postpaid, P&C insurance, frequent-flyer programs).
 
-The textbook `Subscription{Created, Renewed, Cancelled}` survives until the second month in production. Then plan changes, pauses, dunning, gifting, trials, comp accounts, proration, tax, late processor webhooks, and revenue recognition each turn out to be their own state machine. A monthly subscription running ten years has 120+ renewal events; a Netflix account opened in 2009 with plan changes and household sharing has thousands. See [`../unbounded-and-infinite-streams.md`](../unbounded-and-infinite-streams.md) §D (lifetime records) for the archetype — this doc is the decomposition playbook.
+The textbook `Subscription{Created, Renewed, Cancelled}` survives until the second month in production. Then plan changes, pauses, dunning, gifting, trials, comp accounts, proration, tax, late processor webhooks, and revenue recognition each turn out to be their own state machine. A monthly subscription running ten years has 120+ renewal events; a Netflix account opened in 2009 with plan changes and household sharing has thousands. See [`../cross-cutting/unbounded-and-infinite-streams.md`](../cross-cutting/unbounded-and-infinite-streams.md) §D (lifetime records) for the archetype — this doc is the decomposition playbook.
 
 ## 1. Aggregate boundaries used in practice
 
@@ -139,6 +139,8 @@ Note the **double counter** (Qantas, AAdvantage, Hilton Honors): a *redeemable* 
 
 ## 4. Cross-aggregate sagas
 
+Subscription billing hits three of the six saga families simultaneously: time-driven retry (renewal heartbeat, dunning), external-system integration (PSP webhooks), and compensation cascade (refunds, chargebacks). See [`../cross-cutting/sagas-and-multi-step-workflows.md`](../cross-cutting/sagas-and-multi-step-workflows.md) for the cross-domain map.
+
 ### 4.1 Renewal cycle (the heartbeat)
 
 ```
@@ -268,6 +270,8 @@ Compare with [`banking-and-finance.md`](banking-and-finance.md) §4.2 (auth → 
 
 ## 9. Revenue recognition vs cash — two different streams
 
+The "cash-ledger ≠ revenue-ledger" split below is the canonical instance of the general pattern: any time *when we got the money* differs from *when we earned it*, you have two ledgers. See [`../cross-cutting/ledgers-and-double-entry.md`](../cross-cutting/ledgers-and-double-entry.md) for the cross-domain view (banking, marketplaces, insurance, ad-tech) and the universal ledger-design rules.
+
 A subscription generates **two** parallel event streams:
 
 | Stream | Fires when | Tracks |
@@ -328,7 +332,7 @@ Gifts are often bought months before redemption and have their own purchase/refu
 
 ## Cross-references
 
-- [`../unbounded-and-infinite-streams.md`](../unbounded-and-infinite-streams.md) — archetype D (lifetime records); this file is the playbook.
+- [`../cross-cutting/unbounded-and-infinite-streams.md`](../cross-cutting/unbounded-and-infinite-streams.md) — archetype D (lifetime records); this file is the playbook.
 - [`banking-and-finance.md`](banking-and-finance.md) — closing-the-books, journal-as-source-of-truth, dispute lifecycle separate from payment, period-sharded streams. The rev-rec stream in §9 is the ledger pattern again.
 - [`ecommerce-and-retail.md`](ecommerce-and-retail.md) — Cart ≠ Order parallels Subscription ≠ BillingPeriod ≠ Invoice. Returns-as-separate-aggregate parallels Reactivation-as-new-chapter (§4.5).
 - [`../../implementation-patterns/multi-aggregate-commands-and-sagas.md`](../../implementation-patterns/multi-aggregate-commands-and-sagas.md) — renewal, plan-change, dunning sagas all instantiate the patterns there.

@@ -8,10 +8,10 @@ Boundaries are chosen for **lifecycle**, **contention**, and **regulatory replay
 
 | Aggregate | Why it's a boundary | Lifecycle |
 |---|---|---|
-| **Customer / Party** | KYC state, regulatory identity, slow-changing. Separate so account churn doesn't bloat compliance replay. | Onboard → Verified → Suspended → Closed |
+| **Customer / Party** | KYC state, regulatory identity, slow-changing. Separate so account churn doesn't bloat compliance replay. PII handling under multi-year retention is the classic GDPR-vs-immutability tension — see [`../cross-cutting/compliance-pii-and-immutability.md`](../cross-cutting/compliance-pii-and-immutability.md). | Onboard → Verified → Suspended → Closed |
 | **Account** (current / savings / wallet) | Per-account optimistic concurrency, balance invariant. One stream per `accountId`. | Opened → Active → Frozen → Closed |
 | **Card** | Distinct lifecycle from the funding account (issued, activated, lost, replaced). PIN/PAN scope. | Issued → Activated → Blocked → Reissued |
-| **Authorization / Hold** | Short-lived, expires. Separate from the long-lived Account stream so auth retries don't pollute account history. | Requested → Approved → Captured → Expired/Reversed |
+| **Authorization / Hold** | Short-lived, expires. Separate from the long-lived Account stream so auth retries don't pollute account history. Structurally the same reservation pattern as hotel rooms, e-commerce stock, and event tickets — see [`../cross-cutting/reservations-and-finite-resources.md`](../cross-cutting/reservations-and-finite-resources.md). | Requested → Approved → Captured → Expired/Reversed |
 | **Transfer / Payment** | The canonical saga aggregate. Each transfer has its own stream with start/end markers. | Initiated → Debited → Credited → Settled / Reversed |
 | **LedgerEntry / JournalEntry** | The double-entry primitive. Often a *separate* append-only journal stream, not nested inside accounts. | Posted (immutable) |
 | **Loan** | Origination + servicing + repayment schedule. Long-lived but bounded by repayment periods. | Originated → Disbursed → Servicing → Paid Off / Defaulted |
@@ -127,6 +127,8 @@ See Temenos [Lending Events Lifecycle Guide](https://developer.temenos.com/artic
 
 ## 4. Cross-aggregate processes / sagas
 
+The Transfer saga below is *the* textbook event-sourcing saga — referenced by every other domain doc in this directory. For the cross-domain landscape (which industries run which saga families, the universal compensation playbook, idempotency keying strategies, workflow-engine vs aggregate-native trade-offs), see [`../cross-cutting/sagas-and-multi-step-workflows.md`](../cross-cutting/sagas-and-multi-step-workflows.md).
+
 ### 4.1 Money transfer between two accounts (the canonical saga)
 
 ```
@@ -202,6 +204,8 @@ Account emits AccountUnfrozen
 ```
 
 ## 5. Double-entry ledger treatment
+
+The Camp A / Camp B choice below applies to any domain with multi-party value-conserving transactions — see [`../cross-cutting/ledgers-and-double-entry.md`](../cross-cutting/ledgers-and-double-entry.md) for the cross-domain treatment (marketplace settlement, subscription rev-rec, loyalty points, hot-account escapes, the universal multi-currency / value-date / idempotency triple).
 
 Two camps in event-sourced banking:
 

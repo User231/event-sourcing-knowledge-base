@@ -15,9 +15,11 @@ Hotel domain experts (Khononov, Luontola, Dudycz) converge on the same decomposi
 | **RatePlan** | Per property, long-lived. | Pricing rules, restrictions (min-LOS, CTA, CTD). | Independent change cadence (revenue manager updates). |
 | **Guest** / `Guest` profile | Permanent, cross-property. | Identity, contact, preferences, loyalty. | GDPR/erasure boundary; cross-stay identity. |
 | **GroupCheckout** | Short-lived saga state. | Tracks fan-out of N per-guest checkouts. | Distributed-process consistency: completion only when all child checkouts terminate. |
-| **Folio / Invoice** | Snapshot/closing artefact. | Closed financial document, immutable after issue. | Tax/regulatory immutability — different from the open `GuestStayAccount` ledger. |
+| **Folio / Invoice** | Snapshot/closing artefact. | Closed financial document, immutable after issue. | Tax/regulatory immutability — different from the open `GuestStayAccount` ledger. The folio-as-open-ledger / invoice-as-closed-artefact pair is the canonical two-ledger-shapes-in-one-domain example; see [`../cross-cutting/ledgers-and-double-entry.md`](../cross-cutting/ledgers-and-double-entry.md). |
 | **Housekeeping / RoomStatus** | Per-room per-day. | Dirty / clean / inspected / out-of-order. | Owned by a different team with own command stream; loosely coupled to stays. |
 | **Property / Channel** | Configuration. | Connection state, mapping, distribution rules. | Bounded context boundary (distribution) vs. core PMS. |
+
+For the cross-domain "reservation" pattern (airlines, restaurants, healthcare slots, event tickets, EV charging, inventory, banking auth holds) — the universal hold-then-confirm skeleton, ATP arithmetic, overbooking-as-policy, walk/bump compensation, and soft-hold/hard-allocation split — see [`../cross-cutting/reservations-and-finite-resources.md`](../cross-cutting/reservations-and-finite-resources.md). The hotel domain below is the canonical worked example.
 
 ### Why Reservation ≠ GuestStay (the load-bearing distinction)
 
@@ -90,6 +92,8 @@ Production extensions:
 - `DailyOverbookingDetected(RoomType, Date, OverBookedCount, OverBookedOverTheLimitCount)` — emitted by the projection's `IChangeListener` when a bucket goes negative.
 
 ## 4. Cross-aggregate processes / sagas
+
+Group checkout is the canonical fan-out / scatter-gather saga in event-sourcing teaching — Dudycz's sample ships three implementations side by side. For the cross-domain catalogue of saga families and where each one appears, see [`../cross-cutting/sagas-and-multi-step-workflows.md`](../cross-cutting/sagas-and-multi-step-workflows.md).
 
 ### 4a. The end-to-end happy path
 ```

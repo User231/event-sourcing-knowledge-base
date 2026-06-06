@@ -10,7 +10,7 @@ This doc is for ES practitioners who already know Git. It uses Git, Mercurial, S
 - What if you need to merge two divergent histories of the same aggregate?
 - What if "rebasing" an aggregate — emitting a new derived history that supersedes the old — were a legitimate operation?
 
-For where this sits in the broader taxonomy, see [archetype E in unbounded-and-infinite-streams.md](../unbounded-and-infinite-streams.md#e-branching--non-linear-histories).
+For where this sits in the broader taxonomy, see [archetype E in unbounded-and-infinite-streams.md](../cross-cutting/unbounded-and-infinite-streams.md#e-branching--non-linear-histories).
 
 ## 1. The basic mapping and aggregate boundaries
 
@@ -216,4 +216,4 @@ Dolt is the most direct claim: it event-sources a SQL database using Git's data 
 
 **CRDTs & merge theory** — [collaborative-editing-ot-crdt-lww.md](../../concepts/collaborative-editing-ot-crdt-lww.md); [Local-first software, Ink & Switch](https://www.inkandswitch.com/local-first/).
 
-**Adjacent docs** — [unbounded-and-infinite-streams.md §E](../unbounded-and-infinite-streams.md#e-branching--non-linear-histories); [smart-contracts-and-blockchain.md](smart-contracts-and-blockchain.md); [multi-master-distributed-dbs.md](multi-master-distributed-dbs.md); [optimistic-concurrency.md](../../implementation-patterns/optimistic-concurrency.md); [uncommitted-events.md](../../implementation-patterns/uncommitted-events.md).
+**Adjacent docs** — [unbounded-and-infinite-streams.md §E](../cross-cutting/unbounded-and-infinite-streams.md#e-branching--non-linear-histories); [smart-contracts-and-blockchain.md](smart-contracts-and-blockchain.md); [multi-master-distributed-dbs.md](multi-master-distributed-dbs.md); [optimistic-concurrency.md](../../implementation-patterns/optimistic-concurrency.md); [uncommitted-events.md](../../implementation-patterns/uncommitted-events.md).

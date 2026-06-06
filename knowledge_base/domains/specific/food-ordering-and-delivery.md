@@ -2,6 +2,8 @@
 
 How real platforms (DoorDash, Uber Eats, Wolt, Instacart, Deliveroo, plus POS like Toast/Olo) carve the domain into aggregates, streams, and sagas. The two defining splits in this domain: **Cart ≠ Order** (different consistency rules) and **Order ≠ Delivery** (different lifecycle, different operational owner).
 
+Food delivery is a *three-sided* marketplace (customer + restaurant + courier + platform). The cross-domain marketplace mechanics — Demand/Supply/Match anchor aggregates, dispatch as compare-and-swap, multi-party settlement, four-source cancellation, hot in-memory matcher vs durable ES — are in [`../cross-cutting/marketplaces-and-matching-engines.md`](../cross-cutting/marketplaces-and-matching-engines.md).
+
 ## 1. Aggregate boundaries used in practice
 
 Boundaries are driven by **lifecycle, consistency rules, and who owns the truth** — not by entity nouns.
@@ -94,6 +96,8 @@ Wolt's webhook stream emits roughly this set ([Wolt Drive webhooks](https://deve
 
 ## 4. Cross-aggregate processes / sagas
 
+This domain is the clearest case for **workflow engines over aggregate-native sagas** — Cadence at DoorDash, Temporal at Uber Eats. The compensation rules also have a sharp time-axis (pre-accept / post-accept / post-prep cancellation policies). For the cross-domain landscape of saga families and the orchestrator-vs-aggregate-native trade-off, see [`../cross-cutting/sagas-and-multi-step-workflows.md`](../cross-cutting/sagas-and-multi-step-workflows.md).
+
 ### Canonical "happy path" — orchestrated saga
 
 DoorDash's blog spells it out ([Building a More Reliable Checkout Service](https://careersatdoordash.com/blog/building-a-more-reliable-checkout-service-with-kotlin/)): Order Service → Kafka `OrderSubmitted` → Cadence workflow → state-machine steps (fraud check, payment authorise, delivery creation, send-to-merchant) each calling a sibling microservice over gRPC. Each step has a compensation.
@@ -136,6 +140,8 @@ Customer -- CheckoutCart --> Order Service
 Instacart's webhook taxonomy exposes exactly these ([Instacart Event Callbacks](https://docs.instacart.com/connect/api/fulfillment/communications/event_callbacks/)): `Acknowledged`, `Picking`, `Order item replacement`, `Item replaced`, `Item refunded`, `Checkout`, `Delivering`, `Late delivery`.
 
 ### Cancellation policy by stage
+
+The graded-by-stage refund policy below generalises across reservation-shaped domains (hotel cancellation windows, airline fare buckets, restaurant deposits, doctor no-show fees) — see [`../cross-cutting/reservations-and-finite-resources.md`](../cross-cutting/reservations-and-finite-resources.md) §6 for the cross-domain pattern.
 
 - **Pre-accept** (before `OrderAcceptedByRestaurant`): customer cancellation is **free**. Compensation: `VoidAuth`.
 - **Post-accept, pre-prep**: usually free, sometimes partial. Compensation: `VoidAuth` + `NotifyMerchantCancel`.

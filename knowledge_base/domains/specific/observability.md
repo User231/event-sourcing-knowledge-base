@@ -1,6 +1,6 @@
 # Observability — Aggregate & Stream Decomposition
 
-How telemetry platforms (Datadog, Honeycomb, Grafana, Splunk, Elastic, SigNoz) and the incident tooling above them (PagerDuty, incident.io, FireHydrant, Nobl9) structure data — and why **most of it is not event-sourced**. An OpenTelemetry span, a Datadog "event", a Prometheus sample, a syslog line, and a `JournalEntryPosted` all look like immutable append-only records but are not interchangeable. ES applies to the *control plane* (alerts, incidents, SLOs, monitor configs, audit logs), not the *data plane* (raw spans, metrics, logs). See [../unbounded-and-infinite-streams.md#c-high-frequency-telemetry--volume-not-lifetime-is-the-killer](../unbounded-and-infinite-streams.md) — observability is canonical archetype C.
+How telemetry platforms (Datadog, Honeycomb, Grafana, Splunk, Elastic, SigNoz) and the incident tooling above them (PagerDuty, incident.io, FireHydrant, Nobl9) structure data — and why **most of it is not event-sourced**. An OpenTelemetry span, a Datadog "event", a Prometheus sample, a syslog line, and a `JournalEntryPosted` all look like immutable append-only records but are not interchangeable. ES applies to the *control plane* (alerts, incidents, SLOs, monitor configs, audit logs), not the *data plane* (raw spans, metrics, logs). See [../cross-cutting/unbounded-and-infinite-streams.md#c-high-frequency-telemetry--volume-not-lifetime-is-the-killer](../cross-cutting/unbounded-and-infinite-streams.md) — observability is canonical archetype C.
 
 ## 1. The vocabulary collision: "event" means several different things
 
@@ -146,7 +146,7 @@ A trace is a DAG of spans. Each span carries `trace_id` (128-bit), `span_id` (64
 3. **Storage is columnar.** Tempo writes Parquet to S3/GCS. Jaeger backends include Cassandra, OpenSearch, increasingly ClickHouse — Uber-scale Jaeger uses Kafka for ingestion plus ClickHouse for query, billions of spans/day ([Why we migrated Jaeger to ClickHouse](https://dok.community/blog/why-we-decided-to-migrate-our-jaeger-storage-to-clickhouse/)). None optimised for per-aggregate optimistic-locked appends.
 4. **Retention is short.** 7–30 days typical; a regulator asking "replay 2023" doesn't get spans.
 
-What you *can* do is treat **trace_id as a correlation key**, like a saga-id. Stamp the current `trace_id`/`span_id` on every business event emitted during request handling. Trace = short-retention causal view of *how*; event stream = long-retention immutable view of *what*. Datadog calls this trace correlation via the standard `trace_id`/`span_id`/`service`/`env`/`version` tags injected by the agent ([Datadog Observability Explained](https://technoroots.org/insights/datadog-observability-explained-metrics-logs-and-traces-and-how-they-work-together-8rM6B)). The DAG-shaped nature is structurally the same family of problem as branching history (archetype E in [../unbounded-and-infinite-streams.md#e-branching--non-linear-histories](../unbounded-and-infinite-streams.md)) — the operational answer: don't event-source it; project it from sampled spans.
+What you *can* do is treat **trace_id as a correlation key**, like a saga-id. Stamp the current `trace_id`/`span_id` on every business event emitted during request handling. Trace = short-retention causal view of *how*; event stream = long-retention immutable view of *what*. Datadog calls this trace correlation via the standard `trace_id`/`span_id`/`service`/`env`/`version` tags injected by the agent ([Datadog Observability Explained](https://technoroots.org/insights/datadog-observability-explained-metrics-logs-and-traces-and-how-they-work-together-8rM6B)). The DAG-shaped nature is structurally the same family of problem as branching history (archetype E in [../cross-cutting/unbounded-and-infinite-streams.md#e-branching--non-linear-histories](../cross-cutting/unbounded-and-infinite-streams.md)) — the operational answer: don't event-source it; project it from sampled spans.
 
 ## 7. Hot path / cold path / control plane — the three-tier split
 
@@ -216,7 +216,7 @@ Distinguishing question: does anything downstream replay this to derive state? D
 - **On-call overrides are easy to break.** `OverrideApplied` must carry both original and replacement userId plus the time range — otherwise you can't answer "who *should* have been paged at 02:14 last Tuesday."
 - **Trace IDs are not idempotency keys.** A trace ID identifies a request flow, not a unique business operation. Retries of the same idempotent payment have *different* trace IDs. Don't dedupe on trace ID.
 - **Wide-event ingestion ≠ ES.** Honeycomb-style wide structured events are a query optimisation, not an aggregate model. Emit business events to your event store from the same code paths.
-- **Audit log retention vs PII deletion.** GDPR right-to-erasure collides with "audit log is immutable forever." Fixes: store hashes of PII (not raw values), or crypto-shred (per-subject key, delete the key on erasure — entry stays structurally intact but unreadable). Same pattern as [ecommerce-and-retail.md](ecommerce-and-retail.md).
+- **Audit log retention vs PII deletion.** GDPR right-to-erasure collides with "audit log is immutable forever." Fixes: store hashes of PII (not raw values), or crypto-shred (per-subject key, delete the key on erasure — entry stays structurally intact but unreadable). Same pattern as [ecommerce-and-retail.md](ecommerce-and-retail.md); cross-domain treatment in [`../cross-cutting/compliance-pii-and-immutability.md`](../cross-cutting/compliance-pii-and-immutability.md).
 
 ## 13. Sources & case studies
 
@@ -234,7 +234,7 @@ Distinguishing question: does anything downstream replay this to derive state? D
 
 ## Cross-references
 
-- [../unbounded-and-infinite-streams.md#c-high-frequency-telemetry--volume-not-lifetime-is-the-killer](../unbounded-and-infinite-streams.md) — observability is explicitly called out as archetype C.
+- [../cross-cutting/unbounded-and-infinite-streams.md#c-high-frequency-telemetry--volume-not-lifetime-is-the-killer](../cross-cutting/unbounded-and-infinite-streams.md) — observability is explicitly called out as archetype C.
 - [ride-sharing-and-mobility.md](ride-sharing-and-mobility.md) — GPS pings hot/cold pattern is the direct analogue of raw-telemetry / milestone-events here.
 - [../../implementation-patterns/subscription-checkpoints-and-ordering.md](../../implementation-patterns/subscription-checkpoints-and-ordering.md) — correlation / causation / sagaId triple used to stitch business events to telemetry.
 - [banking-and-finance.md §2](banking-and-finance.md#2-stream-id-naming-patterns) — period-sharded stream pattern used identically for `slo-{id}-{period}`.

@@ -2,7 +2,7 @@
 
 Single-region ES is comfortable: one append-only log, one optimistic-lock authority, one clock-ish thing, one regulator. Cross a region boundary and every assumption becomes negotiable. This is the practical playbook — when to pick single-writer / region-pinned / true multi-master, and what each costs once the wire is 80–200 ms long.
 
-Deployment-level companion to substrate-level [multi-master-distributed-dbs.md](multi-master-distributed-dbs.md) and policy-level [federated-systems.md](federated-systems.md). For why histories stop being linear, see [unbounded-and-infinite-streams.md §E](../unbounded-and-infinite-streams.md#e-branching--non-linear-histories).
+Deployment-level companion to substrate-level [multi-master-distributed-dbs.md](multi-master-distributed-dbs.md) and policy-level [federated-systems.md](federated-systems.md). For why histories stop being linear, see [unbounded-and-infinite-streams.md §E](../cross-cutting/unbounded-and-infinite-streams.md#e-branching--non-linear-histories).
 
 ## 1. The latency tax
 
@@ -77,6 +77,8 @@ eu-de-account-{id}                           # region + sub-region for residency
 Routing is grep-able in dead-letter queues; subscription filters (`eu-*`) expose topology; id collisions across regions become structurally impossible. Cost: re-homing renames the stream — a migration, which is the right cost for a deliberate operation.
 
 ## 5. Cross-region sagas
+
+The deployment-axis view of sagas. For the cross-domain saga-family inventory and the universal compensation/idempotency playbook, see [`../cross-cutting/sagas-and-multi-step-workflows.md`](../cross-cutting/sagas-and-multi-step-workflows.md) — this section adds the multi-region multipliers.
 
 A saga spanning regions inherits cross-region latency per hop. The 80–200 ms RTT becomes the *floor* on saga step time; failure mode shifts from "step failed" to "step took too long":
 
@@ -154,6 +156,8 @@ RegionalConflictResolved {
 Loser's events are *not deleted* — that breaks ES immutability. The merge emits compensating events (e.g. `BalanceCorrectedToWinningRegion{delta}`) so projections converge. Loser events stay in their region's log as historical truth: "this is what region X believed happened, before merge."
 
 ## 9. Data residency / GDPR — partition by jurisdiction first
+
+For the cross-domain treatment of compliance and PII under immutability (the four strategies, regulatory regimes, and per-domain summary), see [`../cross-cutting/compliance-pii-and-immutability.md`](../cross-cutting/compliance-pii-and-immutability.md). This section adds the multi-region jurisdiction overlay.
 
 Post-[Schrems II](https://securityboulevard.com/2026/04/schrems-ii-and-the-future-of-cross-border-data-transfers/) reality: personal-data events must not flow freely across jurisdictions. EU PII stays in EU; CCPA, APPI, LGPD, PDPA all add constraints.
 
@@ -243,7 +247,7 @@ The pattern: **the largest production systems all chose region pinning, not glob
 
 ## Cross-references
 
-- [unbounded-and-infinite-streams.md §E — Branching / non-linear histories](../unbounded-and-infinite-streams.md#e-branching--non-linear-histories) — the taxonomy this doc lives under
+- [unbounded-and-infinite-streams.md §E — Branching / non-linear histories](../cross-cutting/unbounded-and-infinite-streams.md#e-branching--non-linear-histories) — the taxonomy this doc lives under
 - [multi-master-distributed-dbs.md](multi-master-distributed-dbs.md) — sibling; substrate-level deep dive on Cassandra / DynamoDB / CockroachDB
 - [federated-systems.md](federated-systems.md) — sibling; federation is multi-region taken to organisational extreme
 - [../../concepts/collaborative-editing-ot-crdt-lww.md](../../concepts/collaborative-editing-ot-crdt-lww.md) — merge strategies in detail (LWW / OT / CRDT)

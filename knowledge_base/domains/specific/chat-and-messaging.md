@@ -1,6 +1,6 @@
 # Chat & Messaging — Aggregate & Stream Decomposition
 
-Chat is the canonical [archetype-B domain](../unbounded-and-infinite-streams.md#b-long-running-conversations--activity-timelines--no-end-of-life): a Slack channel can hold 1M+ messages, the relationship never ends, there is no `ChannelClosed` event. Edits, deletes, reactions, threads, read receipts, typing, federation, E2E encryption each force a distinct call on *what is an aggregate, what is a projection, and what doesn't belong in the event store at all*. Drawing on Slack, Discord, WhatsApp, Signal, Matrix, Telegram, XMPP and IRC ([Discord's ScyllaDB migration](https://discord.com/blog/how-discord-stores-trillions-of-messages), [Slack's Vitess sharding](https://slack.engineering/scaling-datastores-at-slack-with-vitess/), [Matrix's room DAG](https://matrix-org.github.io/synapse/latest/development/room-dag-concepts.html)).
+Chat is the canonical [archetype-B domain](../cross-cutting/unbounded-and-infinite-streams.md#b-long-running-conversations--activity-timelines--no-end-of-life): a Slack channel can hold 1M+ messages, the relationship never ends, there is no `ChannelClosed` event. Edits, deletes, reactions, threads, read receipts, typing, federation, E2E encryption each force a distinct call on *what is an aggregate, what is a projection, and what doesn't belong in the event store at all*. Drawing on Slack, Discord, WhatsApp, Signal, Matrix, Telegram, XMPP and IRC ([Discord's ScyllaDB migration](https://discord.com/blog/how-discord-stores-trillions-of-messages), [Slack's Vitess sharding](https://slack.engineering/scaling-datastores-at-slack-with-vitess/), [Matrix's room DAG](https://matrix-org.github.io/synapse/latest/development/room-dag-concepts.html)).
 
 ## 1. Aggregate boundaries used in practice
 
@@ -126,7 +126,7 @@ UserDeleted            { mode: tombstone | crypto-shred, by }
 
 ## 4. Cross-aggregate processes / sagas
 
-Per the project rule, one command touches one aggregate. Everything cross-aggregate is a saga or a projection. See [../../implementation-patterns/multi-aggregate-commands-and-sagas.md](../../implementation-patterns/multi-aggregate-commands-and-sagas.md).
+Per the project rule, one command touches one aggregate. Everything cross-aggregate is a saga or a projection. See [../../implementation-patterns/multi-aggregate-commands-and-sagas.md](../../implementation-patterns/multi-aggregate-commands-and-sagas.md) for the mechanics; see [`../cross-cutting/sagas-and-multi-step-workflows.md`](../cross-cutting/sagas-and-multi-step-workflows.md) for the cross-domain saga-family taxonomy (chat's message-send is a fan-out; federation backfill is external-system integration).
 
 ### 4.1 Send-a-message fan-out
 
@@ -157,7 +157,7 @@ MessageDeleted  { messageId, deletedBy, reason, hard: false }   # tombstone (def
 MessageRedacted { messageId, redactedBy, retainShape: true }    # hard / GDPR erasure
 ```
 
-Matrix's `m.room.redaction` strips the content from the original event but leaves event-ID, sender, and DAG position so the room's hash-chain stays valid. This is the practical resolution to "GDPR right-to-be-forgotten vs immutable event store" — *content* is removed, *event identity and position* survive. See [ecommerce-and-retail.md](./ecommerce-and-retail.md) for the same crypto-shredding pattern at the row level.
+Matrix's `m.room.redaction` strips the content from the original event but leaves event-ID, sender, and DAG position so the room's hash-chain stays valid. This is the practical resolution to "GDPR right-to-be-forgotten vs immutable event store" — *content* is removed, *event identity and position* survive. See [ecommerce-and-retail.md](./ecommerce-and-retail.md) for the same crypto-shredding pattern at the row level, and [`../cross-cutting/compliance-pii-and-immutability.md`](../cross-cutting/compliance-pii-and-immutability.md) for the cross-domain four-strategy taxonomy (crypto-shred / tombstone / tokenise / rewrite) and the regulatory regimes that drive each.
 
 ### 4.4 Membership change and backfill
 
@@ -255,7 +255,7 @@ For non-federated chat, Snowflakes are sufficient — chronological tiebreaking 
 
 ## Related docs in this knowledge base
 
-- [../unbounded-and-infinite-streams.md](../unbounded-and-infinite-streams.md) — chat is the worked example of archetype B; see the period-sharding patterns.
+- [../cross-cutting/unbounded-and-infinite-streams.md](../cross-cutting/unbounded-and-infinite-streams.md) — chat is the worked example of archetype B; see the period-sharding patterns.
 - [../../concepts/collaborative-editing-ot-crdt-lww.md](../../concepts/collaborative-editing-ot-crdt-lww.md) — for federated chat, ordering across writers reduces to the same merge problem as collaborative documents.
 - [../../implementation-patterns/multi-aggregate-commands-and-sagas.md](../../implementation-patterns/multi-aggregate-commands-and-sagas.md) — message-send fan-out, edit propagation, and federation backfill all use the saga / process-manager shape.
 - [../../implementation-patterns/subscription-checkpoints-and-ordering.md](../../implementation-patterns/subscription-checkpoints-and-ordering.md) — push, search, mentions, and unread-count subscribers all need checkpoint semantics; for federated chat, the ordering guarantee is partial, not total.

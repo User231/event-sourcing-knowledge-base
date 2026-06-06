@@ -117,7 +117,7 @@ The choice matters most where the **event itself** needs to encode merge intent.
 ## Where these show up in this knowledge base
 
 - [domains/spreadsheets.md](../domains/specific/spreadsheets.md) — §5 covers OT/CRDT/LWW choice for the grid-as-document, row-as-record, and dimensional stances. The most thorough domain treatment.
-- [domains/unbounded-and-infinite-streams.md §A](../domains/unbounded-and-infinite-streams.md#a-collaborative-documents--every-keystrokeoperation-is-an-event) — collaborative documents as an archetype where classical ES doesn't fit and CRDTs/OT take over.
+- [domains/unbounded-and-infinite-streams.md §A](../domains/cross-cutting/unbounded-and-infinite-streams.md#a-collaborative-documents--every-keystrokeoperation-is-an-event) — collaborative documents as an archetype where classical ES doesn't fit and CRDTs/OT take over.
 
 ## Foundational references
 

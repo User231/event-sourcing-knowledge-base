@@ -2,6 +2,8 @@
 
 How real companies (Uber, Lyft, Grab, DoorDash, Bolt) decompose ride-sharing and on-demand mobility into aggregates and event streams. The defining tension in this domain: **not everything should be event-sourced**. Hot-path matchmaking lives in memory; only milestones become durable events.
 
+Ride-sharing is the canonical two-sided marketplace. The cross-domain treatment of marketplace mechanics (Demand/Supply/Match anchor aggregates, match-as-CAS, offer pattern, surge as projection, two-sided reputation, multi-party settlement, cancellation by any party, cold-start dynamics) is in [`../cross-cutting/marketplaces-and-matching-engines.md`](../cross-cutting/marketplaces-and-matching-engines.md) — this doc is the ride-specific deep dive.
+
 ## 1. Aggregate boundaries used in practice
 
 Real systems converge on a small set of aggregates because lifecycle, contention, and consistency requirements differ sharply between them. Uber's Fulfillment Platform is the most public reference — they explicitly model **Trip** (the unit of work) and **Supply** (the worker/vehicle) as the two anchor entities, each backed by a hierarchical statechart ([Uber blog](https://www.uber.com/blog/fulfillment-platform-rearchitecture/)).
@@ -54,7 +56,7 @@ Grab's fare-storage system follows this pattern: a stream of `ADD`/`SUB`/`SET` f
 | `TripCancelled` | `cancelledBy{rider|driver|system}, reason, cancellationFee, atState` |
 | `TripNoShow` | `declaredBy=driver, waitedSeconds` |
 | `TripForceCompleted` | `byOperatorId, reason` (ops override for stuck trips) |
-| `FareAdjusted` | `delta, reason{toll|wait_time|route_change|dispute_credit}` (compensating event, never an edit) |
+| `FareAdjusted` | `delta, reason{toll|wait_time|route_change|dispute_credit}` (compensating event, never an edit — the marketplace-ledger rule from [`../cross-cutting/ledgers-and-double-entry.md`](../cross-cutting/ledgers-and-double-entry.md)) |
 | `RatingSubmitted` | `byParty, score, comment` (often projected from rating aggregate) |
 
 ### `driver-{driverId}`
@@ -75,6 +77,8 @@ Note: `DriverLocationUpdated` is intentionally absent — pings live in the hot 
 `ShiftStarted`, `TripEarningRecorded`, `BonusApplied` (quest, surge guarantee), `IncentiveEarned`, `TipReceived`, `ShiftEnded`, `EarningsFinalized`, `PayoutInitiated`.
 
 ## 4. Cross-aggregate processes / sagas
+
+Dispatch is the canonical "hot-path saga" (sub-second matching against a hot in-memory index, decisions persisted as events); payment, shift/earnings, and fare-adjustment are slower compensation-heavy sagas behind it. For the cross-domain inventory of saga families, see [`../cross-cutting/sagas-and-multi-step-workflows.md`](../cross-cutting/sagas-and-multi-step-workflows.md).
 
 ### 4.1 Request → Match → Accept (with timeouts)
 

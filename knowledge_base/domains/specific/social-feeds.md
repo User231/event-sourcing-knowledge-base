@@ -1,6 +1,6 @@
 # Social Feeds & Timelines — Aggregate & Stream Decomposition
 
-Social platforms (Twitter/X, Facebook, Instagram, TikTok, LinkedIn, Pinterest, Reddit, BlueSky, Mastodon) are the canonical case for [archetype B in the unbounded-streams taxonomy](../unbounded-and-infinite-streams.md#b-long-running-conversations--activity-timelines--no-end-of-life): relationship-as-stream with no closing event, write amplification is brutally asymmetric (one celebrity post → 100M timelines), and the "feed" everyone calls *the* model is actually a per-user projection, never an aggregate.
+Social platforms (Twitter/X, Facebook, Instagram, TikTok, LinkedIn, Pinterest, Reddit, BlueSky, Mastodon) are the canonical case for [archetype B in the unbounded-streams taxonomy](../cross-cutting/unbounded-and-infinite-streams.md#b-long-running-conversations--activity-timelines--no-end-of-life): relationship-as-stream with no closing event, write amplification is brutally asymmetric (one celebrity post → 100M timelines), and the "feed" everyone calls *the* model is actually a per-user projection, never an aggregate.
 
 ## 1. Aggregate boundaries used in practice
 
@@ -49,7 +49,7 @@ profile-feed-{userId}                      # "your posts" view on the profile pa
 trending-{topic}-{yyyyMMddHH}              # bucketed trending projection
 ```
 
-**Time-bucketing the inbox** (`feed-{userId}-{yyyyMMdd}`) bounds an otherwise unbounded per-user feed; old buckets cold-archive (see [unbounded streams §B](../unbounded-and-infinite-streams.md#b-long-running-conversations--activity-timelines--no-end-of-life)). Twitter keeps ~800 entries per Redis-cached home timeline ([How Twitter Uses Redis to Scale](https://highscalability.com/how-twitter-uses-redis-to-scale-105tb-ram-39mm-qps-10000-ins/)) — the bound is a product decision; older entries are recoverable by replaying author streams.
+**Time-bucketing the inbox** (`feed-{userId}-{yyyyMMdd}`) bounds an otherwise unbounded per-user feed; old buckets cold-archive (see [unbounded streams §B](../cross-cutting/unbounded-and-infinite-streams.md#b-long-running-conversations--activity-timelines--no-end-of-life)). Twitter keeps ~800 entries per Redis-cached home timeline ([How Twitter Uses Redis to Scale](https://highscalability.com/how-twitter-uses-redis-to-scale-105tb-ram-39mm-qps-10000-ins/)) — the bound is a product decision; older entries are recoverable by replaying author streams.
 
 **BlueSky / AT Protocol** is the odd one out: a literal per-user signed commit log. Stream ID is the user's DID; records addressed as `at://{did}/{collection}/{rkey}` — see §6.
 
@@ -191,6 +191,8 @@ Twitter accepts eventual consistency on counters explicitly. The cost of strong 
 
 ## 6. Edits, deletes, "right to be forgotten", and quote coherence
 
+The tombstoning + crypto-shredding choice below is the social-feed instance of a cross-domain pattern — see [`../cross-cutting/compliance-pii-and-immutability.md`](../cross-cutting/compliance-pii-and-immutability.md) for the full four-strategy taxonomy and how chat, federated systems, blockchain, banking, and healthcare each pick from it.
+
 The hardest design surface because immutability collides with platform policy *and* legal obligations.
 
 **Edits.** X, Mastodon, Facebook, LinkedIn all support edit. `PostPublished` is never mutated; subsequent `PostEdited` events form the revision chain. Reads project the *latest* body; revision history shown to the user is a projection over the chain.
@@ -227,7 +229,7 @@ ActivityPub-based platforms (Mastodon, Pleroma, Pixelfed, Akkoma) treat publishi
 - **`Delete` activities** federate deletes; non-cooperating instances may retain the post — *the* unsolved-by-design federation hazard.
 - **StatusReachFinder** computes which remote inboxes should receive an activity (followers + mentions + reblog audiences).
 
-Each instance is an autonomous event store; cross-instance federation is multi-master, best-effort replication with no global ordering — archetype E ("branching / non-linear histories") in [unbounded streams](../unbounded-and-infinite-streams.md#e-branching--non-linear-histories). Each instance has its own causal history; merge happens by activity replay, not by stream concatenation.
+Each instance is an autonomous event store; cross-instance federation is multi-master, best-effort replication with no global ordering — archetype E ("branching / non-linear histories") in [unbounded streams](../cross-cutting/unbounded-and-infinite-streams.md#e-branching--non-linear-histories). Each instance has its own causal history; merge happens by activity replay, not by stream concatenation.
 
 **Cross-posting between platforms** (a user posting to X, Mastodon, BlueSky, LinkedIn simultaneously via Buffer/Hootsuite/Typefully) is the consumer-side of the same multi-master problem: each platform is its own event stream and aggregate root; there is no shared identity across them. Edits and deletes on the source must be fanned out to each target, and each platform supports a different subset (X edit is paid + short window, Mastodon allows edit, BlueSky allows delete-and-repost, LinkedIn allows edit).
 
